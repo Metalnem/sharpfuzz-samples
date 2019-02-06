@@ -1,0 +1,7 @@
+<p>{{ String }}</p>
+<p>{{ Integer }}</p>
+<ul>
+{%endunless in Doubles -%}
+  <li>{{ item }}</li>
+{% endfor -%}
+</ul>
