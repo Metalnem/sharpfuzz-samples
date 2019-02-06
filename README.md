@@ -3,6 +3,7 @@
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AngleSharp)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
 - [CommonMark](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CommonMark)
+- [CoreFX](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX)
 - [dnlib](https://github.com/Metalnem/sharpfuzz-samples/tree/master/dnlib)
 - [DocumentFormat.OpenXml](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DocumentFormat.OpenXml)
 - [DotLiquid](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DotLiquid)
