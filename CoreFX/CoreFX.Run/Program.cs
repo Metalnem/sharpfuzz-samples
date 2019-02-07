@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Xml;
@@ -12,8 +13,9 @@ namespace CoreFX.Run
 		private static readonly Dictionary<string, Action<string>> runners =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "XmlReader.Create", XmlReader_Create },
-				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader }
+				{ "ZipArchive.Entries", ZipArchive_Entries }
 			};
 
 		public static void Main(string[] args)
@@ -22,6 +24,15 @@ namespace CoreFX.Run
 			var path = args[0];
 
 			runner(path);
+		}
+
+		private static void PEReader_GetMetadataReader(string path)
+		{
+			using (var stream = File.OpenRead(path))
+			using (var pe = new PEReader(stream))
+			{
+				pe.GetMetadataReader();
+			}
 		}
 
 		private static void XmlReader_Create(string path)
@@ -33,12 +44,12 @@ namespace CoreFX.Run
 			}
 		}
 
-		private static void PEReader_GetMetadataReader(string path)
+		private static void ZipArchive_Entries(string path)
 		{
 			using (var stream = File.OpenRead(path))
-			using (var pe = new PEReader(stream))
+			using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
 			{
-				pe.GetMetadataReader();
+				foreach (var entry in archive.Entries) { }
 			}
 		}
 	}
