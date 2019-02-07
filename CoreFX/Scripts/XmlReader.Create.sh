@@ -5,7 +5,7 @@ cd ../CoreFX.Fuzz
 mkdir -p ../Binaries
 mkdir -p ../Findings
 
-dotnet publish -r osx-x64 -o ../Binaries/XmlReader.Create
+dotnet publish -r "$1" -o ../Binaries/XmlReader.Create
 sharpfuzz ../Binaries/XmlReader.Create/System.Private.Xml.dll
 
 cd ..

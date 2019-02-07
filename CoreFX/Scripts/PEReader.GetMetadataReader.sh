@@ -5,7 +5,7 @@ cd ../CoreFX.Fuzz
 mkdir -p ../Binaries
 mkdir -p ../Findings
 
-dotnet publish -r osx-x64 -o ../Binaries/PEReader.GetMetadataReader
+dotnet publish -r "$1" -o ../Binaries/PEReader.GetMetadataReader
 sharpfuzz ../Binaries/PEReader.GetMetadataReader/System.Reflection.Metadata.dll
 
 cd ..
