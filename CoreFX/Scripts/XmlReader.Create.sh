@@ -16,5 +16,6 @@ afl-fuzz \
 	-o Findings/XmlReader.Create \
 	-t 5000 \
 	-m 10000 \
+	-x /usr/local/share/afl/dictionaries/xml.dict \
 	Binaries/XmlReader.Create/CoreFX.Fuzz \
 	@@ XmlReader.Create
