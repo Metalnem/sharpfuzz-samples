@@ -14,7 +14,7 @@ namespace CoreFX.Fuzz
 {
 	public class Program
 	{
-		private static readonly char[] buffer = new char[10_000_000];
+		private static readonly char[] buffer = new char[8192];
 		private static readonly string[] formats = new string[] { "C", "D", "G", "N", "R" };
 
 		private static readonly Dictionary<string, Action<string>> fuzzers =
