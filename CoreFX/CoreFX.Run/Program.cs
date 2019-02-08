@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Web;
 using System.Xml;
 
 namespace CoreFX.Run
@@ -13,6 +14,7 @@ namespace CoreFX.Run
 		private static readonly Dictionary<string, Action<string>> runners =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
@@ -24,6 +26,18 @@ namespace CoreFX.Run
 			var path = args[0];
 
 			runner(path);
+		}
+
+		private static void HttpUtility_UrlEncode(string path)
+		{
+			var text = File.ReadAllText(path);
+			var encoded = HttpUtility.UrlEncode(text);
+			var decoded = HttpUtility.UrlDecode(encoded);
+
+			if (text != decoded)
+			{
+				throw new Exception();
+			}
 		}
 
 		private static void PEReader_GetMetadataReader(string path)
