@@ -129,6 +129,7 @@ namespace CoreFX.Fuzz
 					serializer.ReadObject(file);
 				}
 			}
+			catch (ArgumentOutOfRangeException) { }
 			catch (IndexOutOfRangeException) { }
 			catch (SerializationException) { }
 			catch (XmlException) { }
