@@ -25,6 +25,7 @@ namespace CoreFX.Fuzz
 				{ "BigInteger.Multiply", BigInteger_Multiply },
 				{ "BigInteger.TryParse", BigInteger_TryParse },
 				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
+				{ "DataContractSerializer.ReadObject", DataContractSerializer_ReadObject },
 				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "XmlReader.Create", XmlReader_Create },
@@ -32,7 +33,7 @@ namespace CoreFX.Fuzz
 			};
 
 		[DataContract]
-		private class Json
+		private class Obj
 		{
 			[DataMember] public int A = 0;
 			[DataMember] public double B = 0;
@@ -121,7 +122,7 @@ namespace CoreFX.Fuzz
 		{
 			try
 			{
-				var serializer = new DataContractJsonSerializer(typeof(Json));
+				var serializer = new DataContractJsonSerializer(typeof(Obj));
 
 				using (var file = File.OpenRead(path))
 				{
@@ -129,6 +130,21 @@ namespace CoreFX.Fuzz
 				}
 			}
 			catch (IndexOutOfRangeException) { }
+			catch (SerializationException) { }
+			catch (XmlException) { }
+		}
+
+		private static void DataContractSerializer_ReadObject(string path)
+		{
+			try
+			{
+				var serializer = new DataContractSerializer(typeof(Obj));
+
+				using (var file = File.OpenRead(path))
+				{
+					serializer.ReadObject(file);
+				}
+			}
 			catch (SerializationException) { }
 			catch (XmlException) { }
 		}
