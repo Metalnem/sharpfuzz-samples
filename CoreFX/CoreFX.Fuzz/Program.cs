@@ -6,6 +6,8 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Web;
 using System.Xml;
 using SharpFuzz;
@@ -22,18 +24,37 @@ namespace CoreFX.Fuzz
 			{
 				{ "BigInteger.Multiply", BigInteger_Multiply },
 				{ "BigInteger.TryParse", BigInteger_TryParse },
+				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
 				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
 			};
 
+		[DataContract]
+		private class Json
+		{
+			[DataMember] public int A = 0;
+			[DataMember] public double B = 0;
+			[DataMember] public DateTime C = DateTime.MinValue;
+			[DataMember] public bool D = false;
+			[DataMember] public List<int> E = null;
+			[DataMember] public string[] F = null;
+		}
+
 		public static void Main(string[] args)
 		{
 			var fuzzer = fuzzers[args[1]];
 			var path = args[0];
 
-			Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
+			{
+				fuzzer(path);
+			}
+			else
+			{
+				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+			}
 		}
 
 		private static void BigInteger_Multiply(string path)
@@ -94,6 +115,22 @@ namespace CoreFX.Fuzz
 					span.Clear();
 				}
 			}
+		}
+
+		private static void DataContractJsonSerializer_ReadObject(string path)
+		{
+			try
+			{
+				var serializer = new DataContractJsonSerializer(typeof(Json));
+
+				using (var file = File.OpenRead(path))
+				{
+					serializer.ReadObject(file);
+				}
+			}
+			catch (IndexOutOfRangeException) { }
+			catch (SerializationException) { }
+			catch (XmlException) { }
 		}
 
 		private static void HttpUtility_UrlEncode(string path)
