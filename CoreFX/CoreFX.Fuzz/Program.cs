@@ -145,6 +145,7 @@ namespace CoreFX.Fuzz
 					serializer.ReadObject(file);
 				}
 			}
+			catch (ArgumentNullException) { }
 			catch (SerializationException) { }
 			catch (XmlException) { }
 		}
