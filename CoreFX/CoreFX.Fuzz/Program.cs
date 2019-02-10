@@ -8,6 +8,7 @@ using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using SharpFuzz;
@@ -28,9 +29,19 @@ namespace CoreFX.Fuzz
 				{ "DataContractSerializer.ReadObject", DataContractSerializer_ReadObject },
 				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
+				{ "Regex.Match", Regex_Match },
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
 			};
+
+		private static readonly Lazy<List<Regex>> regexes = new Lazy<List<Regex>>(() => new List<Regex>
+		{
+			new Regex("([(][(](?<t>[^)]+)[)])?(?<a>[^[]+)[[](?<ia>.+)[]][)]?", RegexOptions.None),
+			new Regex("[(][(](?<cast>[^)]+)[)](?<arg>[^)]+)[)]", RegexOptions.None),
+			new Regex("^([a-zA-Z]{1,8})(-[a-zA-Z0-9]{1,8})*$", RegexOptions.None),
+			new Regex("(?<a>[^[]+)[[](?<ia>.+)[]]", RegexOptions.None),
+			new Regex("CN=(.*[^,]+).*", RegexOptions.None)
+		});
 
 		[DataContract]
 		private class Obj
@@ -177,6 +188,16 @@ namespace CoreFX.Fuzz
 			catch (BadImageFormatException) { }
 			catch (InvalidOperationException) { }
 			catch (OverflowException) { }
+		}
+
+		private static void Regex_Match(string path)
+		{
+			var text = File.ReadAllText(path);
+
+			foreach (var regex in regexes.Value)
+			{
+				regex.Match(text);
+			}
 		}
 
 		private static void XmlReader_Create(string path)
