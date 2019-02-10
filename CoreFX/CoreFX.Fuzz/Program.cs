@@ -61,9 +61,10 @@ namespace CoreFX.Fuzz
 		private static void BigInteger_Multiply(string path)
 		{
 			var bytes = File.ReadAllBytes(path);
+			var span = bytes.AsSpan(0, Math.Min(bytes.Length, 8192));
 
-			var left = new BigInteger(bytes.AsSpan(0, bytes.Length / 2).ToArray());
-			var right = new BigInteger(bytes.AsSpan(bytes.Length / 2).ToArray());
+			var left = new BigInteger(span.Slice(0, span.Length / 2).ToArray());
+			var right = new BigInteger(span.Slice(span.Length / 2).ToArray());
 
 			if (left.IsZero)
 			{
