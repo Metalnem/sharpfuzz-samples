@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
+using System.Xml.Serialization;
 using SharpFuzz;
 
 namespace CoreFX.Fuzz
@@ -31,6 +32,7 @@ namespace CoreFX.Fuzz
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "Regex.Match", Regex_Match },
 				{ "XmlReader.Create", XmlReader_Create },
+				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
 			};
 
@@ -44,7 +46,7 @@ namespace CoreFX.Fuzz
 		});
 
 		[DataContract]
-		private class Obj
+		public class Obj
 		{
 			[DataMember] public int A = 0;
 			[DataMember] public double B = 0;
@@ -212,6 +214,20 @@ namespace CoreFX.Fuzz
 			}
 			catch (IndexOutOfRangeException) { }
 			catch (XmlException) { }
+		}
+
+		private static void XmlSerializer_Deserialize(string path)
+		{
+			var serializer = new XmlSerializer(typeof(Obj));
+
+			try
+			{
+				using (var stream = File.OpenRead(path))
+				{
+					serializer.Deserialize(stream);
+				}
+			}
+			catch (InvalidOperationException) { }
 		}
 
 		private static void ZipArchive_Entries(string path)
