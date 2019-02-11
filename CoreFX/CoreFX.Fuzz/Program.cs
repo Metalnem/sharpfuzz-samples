@@ -227,7 +227,9 @@ namespace CoreFX.Fuzz
 					serializer.Deserialize(stream);
 				}
 			}
+			catch (IndexOutOfRangeException) { }
 			catch (InvalidOperationException) { }
+			catch (XmlException) { }
 		}
 
 		private static void ZipArchive_Entries(string path)
