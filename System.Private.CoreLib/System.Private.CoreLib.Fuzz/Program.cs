@@ -10,6 +10,7 @@ namespace System.Private.CoreLib.Fuzz
 		private static readonly Dictionary<string, Action<string>> fuzzers =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "Convert.ToInt32", Convert_ToInt32 },
 				{ "DateTime.TryParse", DateTime_TryParse },
 				{ "Double.TryParse", Double_TryParse },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
@@ -30,7 +31,19 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		public static void DateTime_TryParse(string path)
+		private static void Convert_ToInt32(string path)
+		{
+			var text = File.ReadAllText(path);
+
+			try
+			{
+				Convert.ToInt32(text);
+			}
+			catch (FormatException) { }
+			catch (OverflowException) { }
+		}
+
+		private static void DateTime_TryParse(string path)
 		{
 			var text = File.ReadAllText(path);
 
@@ -46,7 +59,7 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		public static void Double_TryParse(string path)
+		private static void Double_TryParse(string path)
 		{
 			var text = File.ReadAllText(path);
 
@@ -62,7 +75,7 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		public static void TimeSpan_TryParse(string path)
+		private static void TimeSpan_TryParse(string path)
 		{
 			var text = File.ReadAllText(path);
 			TimeSpan.TryParse(text, out _);
