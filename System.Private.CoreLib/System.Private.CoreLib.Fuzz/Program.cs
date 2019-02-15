@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using SharpFuzz;
 
@@ -9,6 +10,7 @@ namespace System.Private.CoreLib.Fuzz
 		private static readonly Dictionary<string, Action<string>> fuzzers =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "DateTime.TryParse", DateTime_TryParse },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
 			};
 
@@ -24,6 +26,17 @@ namespace System.Private.CoreLib.Fuzz
 			else
 			{
 				Fuzzer.Run(() => fuzzer(path));
+			}
+		}
+
+		public static void DateTime_TryParse(string path)
+		{
+			var text = File.ReadAllText(path);
+
+			if (DateTime.TryParse(text, out var dt))
+			{
+				var s = dt.ToString("O");
+				DateTime.Parse(s, null, DateTimeStyles.RoundtripKind);
 			}
 		}
 
