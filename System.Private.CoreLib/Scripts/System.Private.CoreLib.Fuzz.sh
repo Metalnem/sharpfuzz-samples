@@ -7,7 +7,7 @@ mkdir -p ../Findings
 
 dotnet publish -r osx-x64 -o ../Binaries/"$1"
 cp ../OSX.x64.Debug/System.Private.CoreLib.dll ../Binaries/"$1"
-dotnet run --project /Users/Metalnem/Projects/sharpfuzz/src/SharpFuzz.CommandLine/SharpFuzz.CommandLine.csproj ../Binaries/"$1"/System.Private.CoreLib.dll
+sharpfuzz ../Binaries/"$1"/System.Private.CoreLib.dll
 
 cd ..
 rm -rf Findings/"$1"
