@@ -11,6 +11,7 @@ namespace System.Private.CoreLib.Fuzz
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "DateTime.TryParse", DateTime_TryParse },
+				{ "Double.TryParse", Double_TryParse },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
 			};
 
@@ -25,7 +26,7 @@ namespace System.Private.CoreLib.Fuzz
 			}
 			else
 			{
-				Fuzzer.Run(() => fuzzer(path));
+				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
 			}
 		}
 
@@ -33,10 +34,31 @@ namespace System.Private.CoreLib.Fuzz
 		{
 			var text = File.ReadAllText(path);
 
-			if (DateTime.TryParse(text, out var dt))
+			if (DateTime.TryParse(text, out var dt1))
 			{
-				var s = dt.ToString("O");
-				DateTime.Parse(s, null, DateTimeStyles.RoundtripKind);
+				var s = dt1.ToString("O");
+				var dt2 = DateTime.Parse(s, null, DateTimeStyles.RoundtripKind);
+
+				if (dt1 != dt2)
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		public static void Double_TryParse(string path)
+		{
+			var text = File.ReadAllText(path);
+
+			if (Double.TryParse(text, out var d1))
+			{
+				var s = d1.ToString("G17");
+				var d2 = Double.Parse(s);
+
+				if (d1 != d2)
+				{
+					throw new Exception();
+				}
 			}
 		}
 
