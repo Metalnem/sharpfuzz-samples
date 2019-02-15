@@ -26,7 +26,7 @@ namespace System.Private.CoreLib.Fuzz
 			}
 			else
 			{
-				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+				Fuzzer.Run(() => fuzzer(path));
 			}
 		}
 
