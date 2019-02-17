@@ -13,6 +13,7 @@ namespace System.Private.CoreLib.Fuzz
 				{ "Convert.ToInt32", Convert_ToInt32 },
 				{ "DateTime.TryParse", DateTime_TryParse },
 				{ "Double.TryParse", Double_TryParse },
+				{ "Guid.TryParse", Guid_TryParse },
 				{ "IdnMapping.GetAscii", IdnMapping_GetAscii },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
 			};
@@ -74,6 +75,12 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static void Guid_TryParse(string path)
+		{
+			var text = File.ReadAllText(path);
+			Guid.TryParse(text, out _);
 		}
 
 		private static void IdnMapping_GetAscii(string path)
