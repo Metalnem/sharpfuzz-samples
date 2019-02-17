@@ -13,6 +13,7 @@ namespace System.Private.CoreLib.Fuzz
 				{ "Convert.ToInt32", Convert_ToInt32 },
 				{ "DateTime.TryParse", DateTime_TryParse },
 				{ "Double.TryParse", Double_TryParse },
+				{ "IdnMapping.GetAscii", IdnMapping_GetAscii },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
 			};
 
@@ -73,6 +74,25 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static void IdnMapping_GetAscii(string path)
+		{
+			var text = File.ReadAllText(path);
+			var mapping = new IdnMapping();
+
+			try
+			{
+				var ascii = mapping.GetAscii(text);
+				var unicode = mapping.GetUnicode(ascii);
+			}
+			catch (ArgumentException) { }
+
+			try
+			{
+				mapping.GetUnicode(text);
+			}
+			catch (ArgumentException) { }
 		}
 
 		private static void TimeSpan_TryParse(string path)
