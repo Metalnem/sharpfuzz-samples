@@ -123,7 +123,17 @@ namespace System.Private.CoreLib.Fuzz
 		private static void TimeSpan_TryParse(string path)
 		{
 			var text = File.ReadAllText(path);
-			TimeSpan.TryParse(text, out _);
+
+			if (TimeSpan.TryParse(text, out var t1))
+			{
+				var s = t1.ToString("c");
+				var t2 = TimeSpan.Parse(s);
+
+				if (t1 != t2)
+				{
+					throw new Exception();
+				}
+			}
 		}
 	}
 }
