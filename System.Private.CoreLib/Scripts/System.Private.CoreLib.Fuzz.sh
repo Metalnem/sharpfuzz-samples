@@ -5,17 +5,23 @@ cd ../System.Private.CoreLib.Fuzz
 mkdir -p ../Binaries
 mkdir -p ../Findings
 
-dotnet publish -r "$2" -o ../Binaries/"$1"
-cp ../"$3"/System.Private.CoreLib.dll ../Binaries/"$1"
-sharpfuzz ../Binaries/"$1"/System.Private.CoreLib.dll
+target=$1
+platform=$2
+coreLibDir=$3
+
+shift 3
+
+dotnet publish -r $platform -o ../Binaries/$target
+cp ../$coreLibDir/System.Private.CoreLib.dll ../Binaries/$target
+sharpfuzz ../Binaries/$target/System.Private.CoreLib.dll $@
 
 cd ..
-rm -rf Findings/"$1"
+rm -rf Findings/$target
 
 afl-fuzz \
-	-i Testcases/"$1" \
-	-o Findings/"$1" \
+	-i Testcases/$target \
+	-o Findings/$target \
 	-t 5000 \
 	-m 10000 \
-	Binaries/"$1"/System.Private.CoreLib.Fuzz \
-	@@ "$1"
+	Binaries/$target/System.Private.CoreLib.Fuzz \
+	@@ $target

@@ -36,13 +36,31 @@ namespace System.Private.CoreLib.Fuzz
 		private static void Convert_ToInt32(string path)
 		{
 			var text = File.ReadAllText(path);
+			var fromBases = new int[] { 2, 8, 10, 16 };
 
-			try
+			foreach (var fromBase in fromBases)
 			{
-				Convert.ToInt32(text);
+				int? n1 = null;
+
+				try
+				{
+					n1 = Convert.ToInt32(text, fromBase);
+				}
+				catch (ArgumentException) { }
+				catch (FormatException) { }
+				catch (OverflowException) { }
+
+				if (n1.HasValue)
+				{
+					var s = Convert.ToString(n1.Value, fromBase);
+					var n2 = Convert.ToInt32(s, fromBase);
+
+					if (n1 != n2)
+					{
+						throw new Exception();
+					}
+				}
 			}
-			catch (FormatException) { }
-			catch (OverflowException) { }
 		}
 
 		private static void DateTime_TryParse(string path)
