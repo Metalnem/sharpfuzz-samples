@@ -12,6 +12,7 @@ namespace System.Private.CoreLib.Fuzz
 			{
 				{ "Convert.ToInt32", Convert_ToInt32 },
 				{ "DateTime.TryParse", DateTime_TryParse },
+				{ "Decimal.Multiply", Decimal_Multiply },
 				{ "Double.TryParse", Double_TryParse },
 				{ "Guid.TryParse", Guid_TryParse },
 				{ "IdnMapping.GetAscii", IdnMapping_GetAscii },
@@ -73,6 +74,25 @@ namespace System.Private.CoreLib.Fuzz
 				var dt2 = DateTime.Parse(s, null, DateTimeStyles.RoundtripKind);
 
 				if (dt1 != dt2)
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		private static void Decimal_Multiply(string path)
+		{
+			var text = File.ReadAllText(path);
+
+			if (Decimal.TryParse(text, out var d))
+			{
+				try
+				{
+					Decimal.Multiply(d, d);
+				}
+				catch (OverflowException) { }
+
+				if (d != 0 && Decimal.Divide(d, d) != 1)
 				{
 					throw new Exception();
 				}
