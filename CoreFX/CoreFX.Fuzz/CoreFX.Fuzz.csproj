@@ -3,11 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Private.CoreFx.NETCoreApp" Version="4.5.220-servicing-27207-03" />
+    <PackageReference Include="SharpFuzz" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Private.CoreFx.NETCoreApp" Version="4.5.220-servicing-27318-02" />
   </ItemGroup>
 
   <PropertyGroup>

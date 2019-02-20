@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -31,6 +32,9 @@ namespace CoreFX.Fuzz
 				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
 				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
 				{ "Regex.Match", Regex_Match },
+				{ "Utf8Parser.TryParseDateTime", Utf8Parser_TryParseDateTime },
+				{ "Utf8Parser.TryParseDouble", Utf8Parser_TryParseDouble },
+				{ "Utf8Parser.TryParseTimeSpan", Utf8Parser_TryParseTimeSpan },
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
@@ -199,6 +203,77 @@ namespace CoreFX.Fuzz
 			foreach (var regex in regexes.Value)
 			{
 				regex.Match(text);
+			}
+		}
+
+		private static void Utf8Parser_TryParseDateTime(string path)
+		{
+			Span<byte> from = File.ReadAllBytes(path);
+			Span<byte> to = stackalloc byte[256];
+
+			if (Utf8Parser.TryParse(from, out DateTime dt1, out _))
+			{
+				var format = 'O';
+
+				if (!Utf8Formatter.TryFormat(dt1, to, out int written, format))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out DateTime dt2, out _, format))
+				{
+					throw new Exception();
+				}
+
+				if (dt1 != dt2)
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		private static void Utf8Parser_TryParseDouble(string path)
+		{
+			Span<byte> from = File.ReadAllBytes(path);
+			Span<byte> to = stackalloc byte[256];
+
+			if (Utf8Parser.TryParse(from, out double d1, out _))
+			{
+				if (!Utf8Formatter.TryFormat(d1, to, out int written))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out double d2, out _))
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		private static void Utf8Parser_TryParseTimeSpan(string path)
+		{
+			Span<byte> from = File.ReadAllBytes(path);
+			Span<byte> to = stackalloc byte[256];
+
+			if (Utf8Parser.TryParse(from, out TimeSpan t1, out _))
+			{
+				var format = 'c';
+
+				if (!Utf8Formatter.TryFormat(t1, to, out int written, format))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out TimeSpan t2, out _, format))
+				{
+					throw new Exception();
+				}
+
+				if (t1 != t2)
+				{
+					throw new Exception();
+				}
 			}
 		}
 
