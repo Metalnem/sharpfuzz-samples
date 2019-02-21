@@ -9,11 +9,7 @@ namespace System.Text.Json.Run
 		{
 			using (var file = File.OpenRead(args[0]))
 			{
-				try
-				{
-					JsonDocument.Parse(file);
-				}
-				catch (InvalidOperationException) { }
+				JsonDocument.Parse(file);
 			}
 		}
 	}
