@@ -8,7 +8,9 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
@@ -27,6 +29,7 @@ namespace CoreFX.Fuzz
 			{
 				{ "BigInteger.Multiply", BigInteger_Multiply },
 				{ "BigInteger.TryParse", BigInteger_TryParse },
+				{ "BinaryFormatter.Deserialize", BinaryFormatter_Deserialize },
 				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
 				{ "DataContractSerializer.ReadObject", DataContractSerializer_ReadObject },
 				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
@@ -50,6 +53,7 @@ namespace CoreFX.Fuzz
 		});
 
 		[DataContract]
+		[Serializable]
 		public class Obj
 		{
 			[DataMember] public int A = 0;
@@ -134,6 +138,31 @@ namespace CoreFX.Fuzz
 					span.Clear();
 				}
 			}
+		}
+
+		private static void BinaryFormatter_Deserialize(string path)
+		{
+			var formatter = new BinaryFormatter();
+
+			try
+			{
+				using (var file = File.OpenRead(path))
+				{
+					formatter.Deserialize(file);
+				}
+			}
+			catch (ArgumentOutOfRangeException) { }
+			catch (DecoderFallbackException) { }
+			catch (ArgumentException) { }
+			catch (FileLoadException) { }
+			catch (FormatException) { }
+			catch (IndexOutOfRangeException) { }
+			catch (IOException) { }
+			catch (MemberAccessException) { }
+			catch (NullReferenceException) { }
+			catch (OutOfMemoryException) { }
+			catch (OverflowException) { }
+			catch (SerializationException) { }
 		}
 
 		private static void DataContractJsonSerializer_ReadObject(string path)
