@@ -24,6 +24,11 @@ namespace CoreFX.Fuzz
 		private static readonly char[] buffer = new char[8192];
 		private static readonly string[] formats = new string[] { "C", "D", "G", "N", "R" };
 
+		private const string headerString =
+			"AAEAAAD/////AQAAAAAAAAAMAgAAAEJDb3JlRlguRnV6eiwgVmVyc2lvbj" + "0xLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPW51" + "bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
+
+		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
+
 		private static readonly Dictionary<string, Action<string>> fuzzers =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
@@ -53,7 +58,6 @@ namespace CoreFX.Fuzz
 		});
 
 		[DataContract]
-		[Serializable]
 		public class Obj
 		{
 			[DataMember] public int A = 0;
@@ -62,6 +66,14 @@ namespace CoreFX.Fuzz
 			[DataMember] public bool D = false;
 			[DataMember] public List<int> E = null;
 			[DataMember] public string[] F = null;
+		}
+
+		[Serializable]
+		public class Bin
+		{
+			[DataMember] public int A = 0;
+			[DataMember] public double B = 0;
+			[DataMember] public string[] C = null;
 		}
 
 		public static void Main(string[] args)
@@ -146,17 +158,25 @@ namespace CoreFX.Fuzz
 
 			try
 			{
-				using (var file = File.OpenRead(path))
+				var bytes = File.ReadAllBytes(path);
+				var buffer = new byte[headerBytes.Length + bytes.Length];
+
+				Array.Copy(headerBytes, buffer, headerBytes.Length);
+				Array.Copy(bytes, 0, buffer, headerBytes.Length, bytes.Length);
+
+				using (var stream = new MemoryStream(buffer))
 				{
-					formatter.Deserialize(file);
+					formatter.Deserialize(stream);
 				}
 			}
 			catch (ArgumentOutOfRangeException) { }
+			catch (ArrayTypeMismatchException) { }
 			catch (DecoderFallbackException) { }
 			catch (ArgumentException) { }
 			catch (FileLoadException) { }
 			catch (FormatException) { }
 			catch (IndexOutOfRangeException) { }
+			catch (InvalidCastException) { }
 			catch (IOException) { }
 			catch (MemberAccessException) { }
 			catch (NullReferenceException) { }
