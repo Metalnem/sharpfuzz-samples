@@ -38,6 +38,7 @@
 - [SixLabors.Fonts](https://github.com/Metalnem/sharpfuzz-samples/tree/master/SixLabors.Fonts)
 - [SixLabors.ImageSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/SixLabors.ImageSharp)
 - [System.Private.CoreLib](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib)
+- [System.Text.Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Text.Json)
 - [Utf8Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Utf8Json)
 - [WebMarkupMin.Core](https://github.com/Metalnem/sharpfuzz-samples/tree/master/WebMarkupMin.Core)
 - [YamlDotNet](https://github.com/Metalnem/sharpfuzz-samples/tree/master/YamlDotNet)
