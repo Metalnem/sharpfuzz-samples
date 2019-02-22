@@ -151,16 +151,6 @@ namespace CoreFX.Fuzz
 				throw new Exception();
 			}
 
-			if (a < 0 && ((b.Sign == d.Sign && !r.IsZero) || r > 0))
-			{
-				throw new Exception();
-			}
-
-			if (a > 0 && ((b.Sign != d.Sign && !r.IsZero) || r < 0))
-			{
-				throw new Exception();
-			}
-
 			if (b * d + r != a)
 			{
 				throw new Exception();
