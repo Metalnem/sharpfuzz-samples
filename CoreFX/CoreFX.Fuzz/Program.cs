@@ -32,7 +32,7 @@ namespace CoreFX.Fuzz
 		private static readonly Dictionary<string, Action<string>> fuzzers =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
-				{ "BigInteger.Multiply", BigInteger_Multiply },
+				{ "BigInteger.DivRem", BigInteger_DivRem },
 				{ "BigInteger.TryParse", BigInteger_TryParse },
 				{ "BinaryFormatter.Deserialize", BinaryFormatter_Deserialize },
 				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
@@ -91,41 +91,61 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BigInteger_Multiply(string path)
+		private static void BigInteger_DivRem(string path)
 		{
 			var bytes = File.ReadAllBytes(path);
-			var span = bytes.AsSpan(0, Math.Min(bytes.Length, 8192));
 
-			var left = new BigInteger(span.Slice(0, span.Length / 2).ToArray());
-			var right = new BigInteger(span.Slice(span.Length / 2).ToArray());
-
-			if (left.IsZero)
+			if (bytes.Length == 0 || bytes.Length > 8192)
 			{
-				left = new BigInteger(1);
+				return;
 			}
 
-			if (right.IsZero)
+			var first = bytes[0];
+			var span = bytes.AsSpan(1);
+			var l = span.Length;
+
+			var l1 = ((first & 0x3f) * l) / 0x3f;
+			var l2 = l - l1;
+
+			var s1 = first & 0x40;
+			var s2 = first & 0x80;
+
+			var a = new BigInteger(span.Slice(0, l).ToArray());
+			var b = new BigInteger(span.Slice(l).ToArray());
+
+			if (b.IsZero)
 			{
-				right = new BigInteger(1);
+				return;
 			}
 
-			var absLeft = BigInteger.Abs(left);
-			var absRight = BigInteger.Abs(right);
+			if (s1 == 0 && a >= 0)
+			{
+				a = BigInteger.Negate(a);
+			}
 
-			var product = BigInteger.Multiply(left, right);
+			if (s2 == 0 && b >= 0)
+			{
+				b = BigInteger.Negate(b);
+			}
 
-			var gcdLeft = BigInteger.GreatestCommonDivisor(product, left);
-			var gcdRight = BigInteger.GreatestCommonDivisor(product, right);
+			var d = BigInteger.DivRem(a, b, out var r);
 
-			if (absLeft != gcdLeft || absRight != gcdRight)
+			if (a.IsZero && !(d.IsZero && r.IsZero))
 			{
 				throw new Exception();
 			}
 
-			var divLeft = BigInteger.Divide(product, left);
-			var divRight = BigInteger.Divide(product, right);
+			if (a < 0 && ((b.Sign == d.Sign && !r.IsZero) || r > 0))
+			{
+				throw new Exception();
+			}
 
-			if (left != divRight || right != divLeft)
+			if (a > 0 && ((b.Sign != d.Sign && !r.IsZero) || r < 0))
+			{
+				throw new Exception();
+			}
+
+			if (b * d + r != a)
 			{
 				throw new Exception();
 			}
