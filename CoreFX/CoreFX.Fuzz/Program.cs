@@ -32,7 +32,9 @@ namespace CoreFX.Fuzz
 		private static readonly int[] reducerThresholds = new int[] { 0, 32, Int32.MaxValue };
 
 		private const string headerString =
-			"AAEAAAD/////AQAAAAAAAAAMAgAAAEJDb3JlRlguRnV6eiwgVmVyc2lvbj" + "0xLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPW51" + "bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
+			"AAEAAAD/////AQAAAAAAAAAMAgAAAEJDb3JlRlguRnV6eiwgVmVyc2lvbj" +
+			"0xLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPW51" +
+			"bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
 
 		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
 
