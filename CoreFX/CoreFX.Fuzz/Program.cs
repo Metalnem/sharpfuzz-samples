@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Numerics;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
@@ -24,6 +25,12 @@ namespace CoreFX.Fuzz
 		private static readonly char[] buffer = new char[8192];
 		private static readonly string[] formats = new string[] { "C", "D", "G", "N", "R" };
 
+		private static readonly FieldInfo squareThresholdField;
+		private static readonly FieldInfo reducerThresholdField;
+
+		private static readonly int[] squareThresholds = new int[] { 4, 32, Int32.MaxValue };
+		private static readonly int[] reducerThresholds = new int[] { 0, 32, Int32.MaxValue };
+
 		private const string headerString =
 			"AAEAAAD/////AQAAAAAAAAAMAgAAAEJDb3JlRlguRnV6eiwgVmVyc2lvbj" + "0xLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPW51" + "bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
 
@@ -33,6 +40,7 @@ namespace CoreFX.Fuzz
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "BigInteger.DivRem", BigInteger_DivRem },
+				{ "BigInteger.ModPow", BigInteger_ModPow },
 				{ "BigInteger.TryParse", BigInteger_TryParse },
 				{ "BinaryFormatter.Deserialize", BinaryFormatter_Deserialize },
 				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
@@ -76,6 +84,13 @@ namespace CoreFX.Fuzz
 			[DataMember] public string[] C = null;
 		}
 
+		static Program()
+		{
+			var bigIntegerCalculator = typeof(BigInteger).Assembly.GetType("System.Numerics.BigIntegerCalculator");
+			squareThresholdField = bigIntegerCalculator.GetField("SquareThreshold", BindingFlags.NonPublic | BindingFlags.Static);
+			reducerThresholdField = bigIntegerCalculator.GetField("ReducerThreshold", BindingFlags.NonPublic | BindingFlags.Static);
+		}
+
 		public static void Main(string[] args)
 		{
 			var fuzzer = fuzzers[args[1]];
@@ -100,18 +115,17 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			var first = bytes[0];
 			var span = bytes.AsSpan(1);
-			var l = span.Length;
+			var len = span.Length;
 
-			var l1 = ((first & 0x3f) * l) / 0x3f;
-			var l2 = l - l1;
+			var l1 = ((bytes[0] & 0x3f) * len) / 0x3f;
+			var l2 = len - l1;
 
-			var s1 = first & 0x40;
-			var s2 = first & 0x80;
+			var s1 = bytes[0] & 0x40;
+			var s2 = bytes[0] & 0x80;
 
-			var a = new BigInteger(span.Slice(0, l).ToArray());
-			var b = new BigInteger(span.Slice(l).ToArray());
+			var a = new BigInteger(span.Slice(0, len).ToArray());
+			var b = new BigInteger(span.Slice(len).ToArray());
 
 			if (b.IsZero)
 			{
@@ -148,6 +162,70 @@ namespace CoreFX.Fuzz
 			if (b * d + r != a)
 			{
 				throw new Exception();
+			}
+		}
+
+		private static void BigInteger_ModPow(string path)
+		{
+			var bytes = File.ReadAllBytes(path);
+
+			if (bytes.Length <= 2 || bytes.Length > 8192)
+			{
+				return;
+			}
+
+			var span = bytes.AsSpan(3);
+			var len = span.Length;
+
+			var l1 = (bytes[0] * len) / 255;
+			var l2 = (bytes[1] * (len - l1)) / 255;
+			var l3 = len - l1 - l2;
+
+			var sa = bytes[2] & 1;
+			var sc = bytes[2] & 2;
+
+			var a = new BigInteger(span.Slice(0, l1).ToArray());
+			var b = new BigInteger(span.Slice(l1, l2).ToArray());
+			var c = new BigInteger(span.Slice(l1 + l2).ToArray());
+
+			if (c.IsZero)
+			{
+				return;
+			}
+
+			if (sa == 0 && a >= 0)
+			{
+				a = BigInteger.Negate(a);
+			}
+
+			if (b < 0)
+			{
+				b = BigInteger.Negate(b);
+			}
+
+			if (sc == 0 && c >= 0)
+			{
+				c = BigInteger.Negate(c);
+			}
+
+			BigInteger? result = null;
+
+			foreach (var squareThreshold in squareThresholds)
+			{
+				foreach (var reducerThreshold in reducerThresholds)
+				{
+					squareThresholdField.SetValue(null, squareThreshold);
+					reducerThresholdField.SetValue(null, reducerThreshold);
+
+					if (result is null)
+					{
+						result = BigInteger.ModPow(a, b, c);
+					}
+					else if (result != BigInteger.ModPow(a, b, c))
+					{
+						throw new Exception();
+					}
+				}
 			}
 		}
 
