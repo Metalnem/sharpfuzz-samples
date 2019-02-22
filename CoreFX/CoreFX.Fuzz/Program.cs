@@ -126,8 +126,8 @@ namespace CoreFX.Fuzz
 			var s1 = bytes[0] & 0x40;
 			var s2 = bytes[0] & 0x80;
 
-			var a = new BigInteger(span.Slice(0, len).ToArray());
-			var b = new BigInteger(span.Slice(len).ToArray());
+			var a = new BigInteger(span.Slice(0, l1).ToArray());
+			var b = new BigInteger(span.Slice(l1).ToArray());
 
 			if (b.IsZero)
 			{
