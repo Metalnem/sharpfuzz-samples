@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using SharpFuzz;
 
 namespace System.Private.CoreLib.Fuzz
@@ -17,6 +18,8 @@ namespace System.Private.CoreLib.Fuzz
 				{ "Guid.TryParse", Guid_TryParse },
 				{ "IdnMapping.GetAscii", IdnMapping_GetAscii },
 				{ "TimeSpan.TryParse", TimeSpan_TryParse },
+				{ "UnicodeEncoding.GetString", UnicodeEncoding_GetString },
+				{ "UTF8Encoding.GetString", UTF8Encoding_GetString }
 			};
 
 		public static void Main(string[] args)
@@ -154,6 +157,26 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static void UnicodeEncoding_GetString(string path)
+		{
+			try
+			{
+				var bytes = File.ReadAllBytes(path);
+				Encoding.Unicode.GetString(bytes);
+			}
+			catch (ArgumentException) { }
+		}
+
+		private static void UTF8Encoding_GetString(string path)
+		{
+			try
+			{
+				var bytes = File.ReadAllBytes(path);
+				Encoding.UTF8.GetString(bytes);
+			}
+			catch (ArgumentException) { }
 		}
 	}
 }
