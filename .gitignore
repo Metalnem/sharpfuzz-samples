@@ -6,7 +6,5 @@
 [Oo]bj/
 
 # afl-fuzz
-CoreFX/Binaries/
-CoreFX/Findings/
-System.Private.CoreLib/Binaries/
-System.Private.CoreLib/Findings/
+*/Binaries/
+*/Findings/
