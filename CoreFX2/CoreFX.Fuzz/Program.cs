@@ -107,8 +107,8 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			var path = args[0];
 			var fuzzer = aflFuzz[args[1]];
+			var path = args[0];
 
 			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
