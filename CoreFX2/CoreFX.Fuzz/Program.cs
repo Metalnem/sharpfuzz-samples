@@ -101,23 +101,22 @@ namespace CoreFX.Fuzz
 
 		public static void Main(string[] args)
 		{
-			var path = args[0];
-			var method = args[1];
-
-			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
+			if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
 			{
-				var fuzzer = aflFuzz[method];
-				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+				Fuzzer.LibFuzzer.Run(libFuzzer["XmlSerializer.Deserialize"]);
+				return;
 			}
-			else if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
+
+			var path = args[0];
+			var fuzzer = aflFuzz[args[1]];
+
+			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
-				var fuzzer = libFuzzer[method];
-				Fuzzer.LibFuzzer.Run(fuzzer);
+				fuzzer(path);
 			}
 			else
 			{
-				var fuzzer = aflFuzz[method];
-				fuzzer(path);
+				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
 			}
 		}
 
