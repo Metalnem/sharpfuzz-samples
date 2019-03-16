@@ -38,7 +38,7 @@ namespace CoreFX.Fuzz
 
 		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
 
-		private static readonly Dictionary<string, Action<string>> fuzzers =
+		private static readonly Dictionary<string, Action<string>> aflFuzz =
 			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "BigInteger.DivRem", BigInteger_DivRem },
@@ -56,6 +56,12 @@ namespace CoreFX.Fuzz
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize },
 				{ "ZipArchive.Entries", ZipArchive_Entries }
+			};
+
+		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
+			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize }
 			};
 
 		private static readonly Lazy<List<Regex>> regexes = new Lazy<List<Regex>>(() => new List<Regex>
@@ -95,16 +101,23 @@ namespace CoreFX.Fuzz
 
 		public static void Main(string[] args)
 		{
-			var fuzzer = fuzzers[args[1]];
 			var path = args[0];
+			var method = args[1];
 
-			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
+			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
 			{
-				fuzzer(path);
+				var fuzzer = aflFuzz[method];
+				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+			}
+			else if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
+			{
+				var fuzzer = libFuzzer[method];
+				Fuzzer.LibFuzzer.Run(fuzzer);
 			}
 			else
 			{
-				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+				var fuzzer = aflFuzz[method];
+				fuzzer(path);
 			}
 		}
 
@@ -437,6 +450,22 @@ namespace CoreFX.Fuzz
 			try
 			{
 				using (var stream = File.OpenRead(path))
+				{
+					serializer.Deserialize(stream);
+				}
+			}
+			catch (IndexOutOfRangeException) { }
+			catch (InvalidOperationException) { }
+			catch (XmlException) { }
+		}
+
+		private static void XmlSerializer_Deserialize(ReadOnlySpan<byte> data)
+		{
+			var serializer = new XmlSerializer(typeof(Obj));
+
+			try
+			{
+				using (var stream = new MemoryStream(data.ToArray()))
 				{
 					serializer.Deserialize(stream);
 				}
