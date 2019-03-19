@@ -61,6 +61,7 @@ namespace CoreFX.Fuzz
 		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
 			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "XmlReader.Create", XmlReader_Create },
 				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize }
 			};
 
@@ -103,7 +104,7 @@ namespace CoreFX.Fuzz
 		{
 			if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
 			{
-				Fuzzer.LibFuzzer.Run(libFuzzer["XmlSerializer.Deserialize"]);
+				Fuzzer.LibFuzzer.Run(libFuzzer[args[0]]);
 				return;
 			}
 
@@ -433,6 +434,20 @@ namespace CoreFX.Fuzz
 			try
 			{
 				using (var stream = File.OpenRead(path))
+				using (var xml = XmlReader.Create(stream))
+				{
+					while (xml.Read()) { }
+				}
+			}
+			catch (IndexOutOfRangeException) { }
+			catch (XmlException) { }
+		}
+
+		private static void XmlReader_Create(ReadOnlySpan<byte> data)
+		{
+			try
+			{
+				using (var stream = new MemoryStream(data.ToArray()))
 				using (var xml = XmlReader.Create(stream))
 				{
 					while (xml.Read()) { }
