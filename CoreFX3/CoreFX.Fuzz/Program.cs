@@ -24,7 +24,7 @@ namespace CoreFX.Fuzz
 		{
 			if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
 			{
-				Fuzzer.LibFuzzer.Run(libFuzzer["JsonDocument.Parse"]);
+				Fuzzer.LibFuzzer.Run(libFuzzer[args[0]]);
 				return;
 			}
 
