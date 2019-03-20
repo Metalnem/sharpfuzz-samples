@@ -19,9 +19,9 @@ cd ..
 rm -rf Findings/$target
 cp -r Testcases/$target/ Findings/$target
 
-clang-7 -fsanitize=fuzzer LibFuzzer/libFuzzer.c -o Binaries/"$1"/fuzzer
+clang-7 -fsanitize=fuzzer LibFuzzer/libFuzzer.c -o Binaries/$target/fuzzer
 
-Binaries/"$1"/fuzzer \
+Binaries/$target/fuzzer \
 	-timeout=10 \
 	--target_path=Binaries/$target/System.Private.CoreLib.Fuzz \
 	--target_arg=$target \
