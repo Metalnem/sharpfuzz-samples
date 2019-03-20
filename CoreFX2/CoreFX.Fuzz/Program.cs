@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -61,6 +62,10 @@ namespace CoreFX.Fuzz
 		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
 			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
 			{
+				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
+				{ "Utf8Parser.TryParseDateTime", Utf8Parser_TryParseDateTime },
+				{ "Utf8Parser.TryParseDouble", Utf8Parser_TryParseDouble },
+				{ "Utf8Parser.TryParseTimeSpan", Utf8Parser_TryParseTimeSpan },
 				{ "XmlReader.Create", XmlReader_Create },
 				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize }
 			};
@@ -333,6 +338,18 @@ namespace CoreFX.Fuzz
 			}
 		}
 
+		private static void HttpUtility_UrlEncode(ReadOnlySpan<byte> data)
+		{
+			var input = data.ToArray();
+			var encoded = HttpUtility.UrlEncodeToBytes(input);
+			var decoded = HttpUtility.UrlDecodeToBytes(encoded);
+
+			if (!input.SequenceEqual(decoded))
+			{
+				throw new Exception();
+			}
+		}
+
 		private static void PEReader_GetMetadataReader(string path)
 		{
 			try
@@ -360,10 +377,14 @@ namespace CoreFX.Fuzz
 
 		private static void Utf8Parser_TryParseDateTime(string path)
 		{
-			Span<byte> from = File.ReadAllBytes(path);
+			Utf8Parser_TryParseDateTime(File.ReadAllBytes(path));
+		}
+
+		private static void Utf8Parser_TryParseDateTime(ReadOnlySpan<byte> data)
+		{
 			Span<byte> to = stackalloc byte[256];
 
-			if (Utf8Parser.TryParse(from, out DateTime dt1, out _))
+			if (Utf8Parser.TryParse(data, out DateTime dt1, out _))
 			{
 				var format = 'O';
 
@@ -386,10 +407,14 @@ namespace CoreFX.Fuzz
 
 		private static void Utf8Parser_TryParseDouble(string path)
 		{
-			Span<byte> from = File.ReadAllBytes(path);
+			Utf8Parser_TryParseDouble(File.ReadAllBytes(path));
+		}
+
+		private static void Utf8Parser_TryParseDouble(ReadOnlySpan<byte> data)
+		{
 			Span<byte> to = stackalloc byte[256];
 
-			if (Utf8Parser.TryParse(from, out double d1, out _))
+			if (Utf8Parser.TryParse(data, out double d1, out _))
 			{
 				if (!Utf8Formatter.TryFormat(d1, to, out int written))
 				{
@@ -405,10 +430,14 @@ namespace CoreFX.Fuzz
 
 		private static void Utf8Parser_TryParseTimeSpan(string path)
 		{
-			Span<byte> from = File.ReadAllBytes(path);
+			Utf8Parser_TryParseTimeSpan(File.ReadAllBytes(path));
+		}
+
+		private static void Utf8Parser_TryParseTimeSpan(ReadOnlySpan<byte> data)
+		{
 			Span<byte> to = stackalloc byte[256];
 
-			if (Utf8Parser.TryParse(from, out TimeSpan t1, out _))
+			if (Utf8Parser.TryParse(data, out TimeSpan t1, out _))
 			{
 				var format = 'c';
 
