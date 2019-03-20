@@ -12,9 +12,9 @@ cd ..
 rm -rf Findings/"$1"
 cp -r Testcases/"$1"/ Findings/"$1"
 
-clang-7 -fsanitize=fuzzer libFuzzer.c -o fuzzer
+clang-7 -fsanitize=fuzzer LibFuzzer/libFuzzer.c -o Binaries/"$1"/fuzzer
 
-fuzzer \
+Binaries/"$1"/fuzzer \
 	-timeout=10 \
 	--target_path=Binaries/"$1"/CoreFX.Fuzz \
 	--target_arg="$1" \
