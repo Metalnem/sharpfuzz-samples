@@ -25,8 +25,7 @@ namespace System.Private.CoreLib.Fuzz
 		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
 			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
 			{
-				{ "DateTime.TryParse", DateTime_TryParse },
-				{ "Double.TryParse", Double_TryParse }
+				{ "DateTime.TryParse", DateTime_TryParse }
 			};
 
 		public static void Main(string[] args)
