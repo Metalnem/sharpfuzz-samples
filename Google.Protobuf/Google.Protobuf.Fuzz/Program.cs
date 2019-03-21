@@ -30,6 +30,7 @@ namespace Google.Protobuf.Fuzz
 						parser.ParseFrom(bytes);
 					}
 					catch (ArgumentException) { }
+					catch (IndexOutOfRangeException) { }
 					catch (InvalidOperationException) { }
 					catch (InvalidProtocolBufferException) { }
 					catch (OutOfMemoryException) { }
