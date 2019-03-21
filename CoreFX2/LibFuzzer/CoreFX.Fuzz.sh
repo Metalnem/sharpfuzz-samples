@@ -11,8 +11,7 @@ sharpfuzz ../Binaries/"$1"/"$2"
 cd ..
 rm -rf Findings/"$1"
 cp -r Testcases/"$1"/ Findings/"$1"
-
-clang-7 -fsanitize=fuzzer LibFuzzer/libFuzzer.c -o Binaries/"$1"/fuzzer
+cp LibFuzzer/libfuzzer-dotnet Binaries/"$1"/fuzzer
 
 Binaries/"$1"/fuzzer \
 	-timeout=10 \

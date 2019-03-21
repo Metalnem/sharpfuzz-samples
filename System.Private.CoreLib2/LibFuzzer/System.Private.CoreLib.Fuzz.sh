@@ -18,8 +18,7 @@ sharpfuzz ../Binaries/$target/System.Private.CoreLib.dll $@
 cd ..
 rm -rf Findings/$target
 cp -r Testcases/$target/ Findings/$target
-
-clang-7 -fsanitize=fuzzer LibFuzzer/libFuzzer.c -o Binaries/$target/fuzzer
+cp LibFuzzer/libfuzzer-dotnet Binaries/$target/fuzzer
 
 Binaries/$target/fuzzer \
 	-timeout=10 \
