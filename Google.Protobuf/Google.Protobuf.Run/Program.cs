@@ -18,7 +18,7 @@ namespace Google.Protobuf.Run
 
 		public static void Main(string[] args)
 		{
-			var bytes = File.OpenRead(args[0]);
+			var bytes = File.ReadAllBytes(args[0]);
 
 			foreach (var parser in parsers)
 			{

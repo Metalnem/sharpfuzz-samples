@@ -21,7 +21,7 @@ namespace Google.Protobuf.Fuzz
 		{
 			Fuzzer.Run(() =>
 			{
-				var bytes = File.OpenRead(args[0]);
+				var bytes = File.ReadAllBytes(args[0]);
 
 				foreach (var parser in parsers)
 				{
