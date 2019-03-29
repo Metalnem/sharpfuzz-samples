@@ -17,5 +17,4 @@ afl-fuzz \
 	-t 5000 \
 	-m 10000 \
 	-x "$3" \
-	Binaries/"$1"/CoreFX.Fuzz \
-	@@ "$1"
+	Binaries/"$1"/CoreFX.Fuzz "$1"

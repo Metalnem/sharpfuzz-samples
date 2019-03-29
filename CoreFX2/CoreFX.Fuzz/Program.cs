@@ -23,7 +23,9 @@ namespace CoreFX.Fuzz
 {
 	public class Program
 	{
-		private static readonly char[] buffer = new char[8192];
+		private static readonly byte[] byteBuffer = new byte[1_000_000];
+		private static readonly char[] charBuffer = new char[8192];
+
 		private static readonly string[] formats = new string[] { "C", "D", "G", "N", "R" };
 
 		private static readonly FieldInfo squareThresholdField;
@@ -39,8 +41,8 @@ namespace CoreFX.Fuzz
 
 		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
 
-		private static readonly Dictionary<string, Action<string>> aflFuzz =
-			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
+			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "BigInteger.DivRem", BigInteger_DivRem },
 				{ "BigInteger.ModPow", BigInteger_ModPow },
@@ -113,22 +115,27 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			var fuzzer = aflFuzz[args[1]];
-			var path = args[0];
-
 			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
-				fuzzer(path);
+				using (var stream = File.OpenRead(args[0]))
+				{
+					var fuzzer = aflFuzz[args[1]];
+					fuzzer(stream);
+				}
 			}
 			else
 			{
-				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+				using (var stream = Console.OpenStandardInput())
+				{
+					var fuzzer = aflFuzz[args[0]];
+					Fuzzer.OutOfProcess.Run(() => fuzzer(stream));
+				}
 			}
 		}
 
-		private static void BigInteger_DivRem(string path)
+		private static void BigInteger_DivRem(Stream stream)
 		{
-			var bytes = File.ReadAllBytes(path);
+			var bytes = ReadAllBytes(stream);
 
 			if (bytes.Length == 0 || bytes.Length > 8192)
 			{
@@ -175,9 +182,9 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BigInteger_ModPow(string path)
+		private static void BigInteger_ModPow(Stream stream)
 		{
-			var bytes = File.ReadAllBytes(path);
+			var bytes = ReadAllBytes(stream);
 
 			if (bytes.Length <= 2 || bytes.Length > 8192)
 			{
@@ -239,16 +246,16 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BigInteger_TryParse(string path)
+		private static void BigInteger_TryParse(Stream stream)
 		{
-			var bytes = File.ReadAllBytes(path);
+			var bytes = ReadAllBytes(stream);
 			var number = new BigInteger(bytes);
 
 			foreach (var format in formats)
 			{
-				if (number.TryFormat(buffer, out var size, format))
+				if (number.TryFormat(charBuffer, out var size, format))
 				{
-					var span = buffer.AsSpan(0, size);
+					var span = charBuffer.AsSpan(0, size);
 
 					if (!BigInteger.TryParse(span, NumberStyles.Any, null, out var parsed) || number != parsed)
 					{
@@ -260,21 +267,21 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BinaryFormatter_Deserialize(string path)
+		private static void BinaryFormatter_Deserialize(Stream stream)
 		{
 			var formatter = new BinaryFormatter();
 
 			try
 			{
-				var bytes = File.ReadAllBytes(path);
+				var bytes = ReadAllBytes(stream);
 				var buffer = new byte[headerBytes.Length + bytes.Length];
 
 				Array.Copy(headerBytes, buffer, headerBytes.Length);
 				Array.Copy(bytes, 0, buffer, headerBytes.Length, bytes.Length);
 
-				using (var stream = new MemoryStream(buffer))
+				using (var memory = new MemoryStream(buffer))
 				{
-					formatter.Deserialize(stream);
+					formatter.Deserialize(memory);
 				}
 			}
 			catch (ArgumentOutOfRangeException) { }
@@ -293,16 +300,12 @@ namespace CoreFX.Fuzz
 			catch (SerializationException) { }
 		}
 
-		private static void DataContractJsonSerializer_ReadObject(string path)
+		private static void DataContractJsonSerializer_ReadObject(Stream stream)
 		{
 			try
 			{
 				var serializer = new DataContractJsonSerializer(typeof(Obj));
-
-				using (var file = File.OpenRead(path))
-				{
-					serializer.ReadObject(file);
-				}
+				serializer.ReadObject(stream);
 			}
 			catch (ArgumentOutOfRangeException) { }
 			catch (IndexOutOfRangeException) { }
@@ -310,31 +313,30 @@ namespace CoreFX.Fuzz
 			catch (XmlException) { }
 		}
 
-		private static void DataContractSerializer_ReadObject(string path)
+		private static void DataContractSerializer_ReadObject(Stream stream)
 		{
 			try
 			{
 				var serializer = new DataContractSerializer(typeof(Obj));
-
-				using (var file = File.OpenRead(path))
-				{
-					serializer.ReadObject(file);
-				}
+				serializer.ReadObject(stream);
 			}
 			catch (ArgumentNullException) { }
 			catch (SerializationException) { }
 			catch (XmlException) { }
 		}
 
-		private static void HttpUtility_UrlEncode(string path)
+		private static void HttpUtility_UrlEncode(Stream stream)
 		{
-			var text = File.ReadAllText(path);
-			var encoded = HttpUtility.UrlEncode(text);
-			var decoded = HttpUtility.UrlDecode(encoded);
-
-			if (text != decoded)
+			using (var reader = new StreamReader(stream))
 			{
-				throw new Exception();
+				var text = reader.ReadToEnd();
+				var encoded = HttpUtility.UrlEncode(text);
+				var decoded = HttpUtility.UrlDecode(encoded);
+
+				if (text != decoded)
+				{
+					throw new Exception();
+				}
 			}
 		}
 
@@ -350,11 +352,10 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void PEReader_GetMetadataReader(string path)
+		private static void PEReader_GetMetadataReader(Stream stream)
 		{
 			try
 			{
-				using (var stream = File.OpenRead(path))
 				using (var pe = new PEReader(stream))
 				{
 					pe.GetMetadataReader();
@@ -365,19 +366,22 @@ namespace CoreFX.Fuzz
 			catch (OverflowException) { }
 		}
 
-		private static void Regex_Match(string path)
+		private static void Regex_Match(Stream stream)
 		{
-			var text = File.ReadAllText(path);
-
-			foreach (var regex in regexes.Value)
+			using (var reader = new StreamReader(stream))
 			{
-				regex.Match(text);
+				var text = reader.ReadToEnd();
+
+				foreach (var regex in regexes.Value)
+				{
+					regex.Match(text);
+				}
 			}
 		}
 
-		private static void Utf8Parser_TryParseDateTime(string path)
+		private static void Utf8Parser_TryParseDateTime(Stream stream)
 		{
-			Utf8Parser_TryParseDateTime(File.ReadAllBytes(path));
+			Utf8Parser_TryParseDateTime(ReadAllBytes(stream));
 		}
 
 		private static void Utf8Parser_TryParseDateTime(ReadOnlySpan<byte> data)
@@ -405,9 +409,9 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void Utf8Parser_TryParseDouble(string path)
+		private static void Utf8Parser_TryParseDouble(Stream stream)
 		{
-			Utf8Parser_TryParseDouble(File.ReadAllBytes(path));
+			Utf8Parser_TryParseDouble(ReadAllBytes(stream));
 		}
 
 		private static void Utf8Parser_TryParseDouble(ReadOnlySpan<byte> data)
@@ -428,9 +432,9 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void Utf8Parser_TryParseTimeSpan(string path)
+		private static void Utf8Parser_TryParseTimeSpan(Stream stream)
 		{
-			Utf8Parser_TryParseTimeSpan(File.ReadAllBytes(path));
+			Utf8Parser_TryParseTimeSpan(ReadAllBytes(stream));
 		}
 
 		private static void Utf8Parser_TryParseTimeSpan(ReadOnlySpan<byte> data)
@@ -458,11 +462,10 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void XmlReader_Create(string path)
+		private static void XmlReader_Create(Stream stream)
 		{
 			try
 			{
-				using (var stream = File.OpenRead(path))
 				using (var xml = XmlReader.Create(stream))
 				{
 					while (xml.Read()) { }
@@ -486,16 +489,13 @@ namespace CoreFX.Fuzz
 			catch (XmlException) { }
 		}
 
-		private static void XmlSerializer_Deserialize(string path)
+		private static void XmlSerializer_Deserialize(Stream stream)
 		{
 			var serializer = new XmlSerializer(typeof(Obj));
 
 			try
 			{
-				using (var stream = File.OpenRead(path))
-				{
-					serializer.Deserialize(stream);
-				}
+				serializer.Deserialize(stream);
 			}
 			catch (IndexOutOfRangeException) { }
 			catch (InvalidOperationException) { }
@@ -518,11 +518,10 @@ namespace CoreFX.Fuzz
 			catch (XmlException) { }
 		}
 
-		private static void ZipArchive_Entries(string path)
+		private static void ZipArchive_Entries(Stream stream)
 		{
 			try
 			{
-				using (var stream = File.OpenRead(path))
 				using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
 				{
 					foreach (var entry in archive.Entries) { }
@@ -530,6 +529,18 @@ namespace CoreFX.Fuzz
 			}
 			catch (InvalidDataException) { }
 			catch (IOException) { }
+		}
+
+		private static byte[] ReadAllBytes(Stream stream)
+		{
+			int size = stream.Read(byteBuffer, 0, byteBuffer.Length);
+
+			if (size == byteBuffer.Length)
+			{
+				throw new Exception();
+			}
+
+			return byteBuffer.AsSpan(0, size).ToArray();
 		}
 	}
 }

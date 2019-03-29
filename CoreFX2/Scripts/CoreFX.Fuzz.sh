@@ -16,5 +16,4 @@ afl-fuzz \
 	-o Findings/"$1" \
 	-t 5000 \
 	-m 10000 \
-	Binaries/"$1"/CoreFX.Fuzz \
-	@@ "$1"
+	Binaries/"$1"/CoreFX.Fuzz "$1"
