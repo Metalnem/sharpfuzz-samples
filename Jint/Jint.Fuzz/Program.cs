@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Esprima;
 using Jint.Runtime;
 using SharpFuzz;
@@ -10,12 +11,15 @@ namespace Jint.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var text = File.ReadAllText(args[0]);
-					new Engine(SetOptions).Execute(text);
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					{
+						var text = reader.ReadToEnd();
+						new Engine(SetOptions).Execute(text);
+					}
 				}
 				catch (ArgumentOutOfRangeException) { }
 				catch (ArgumentException) { }
