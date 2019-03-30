@@ -1,7 +1,0 @@
-<p>{{0<html>St }}</p>
-<p>{{ Integer }}</p>
-<ul>
-{% for item in Doubles -%}
-  <li>{{ item }}</li>
-{% endfor -%}
-</ul>
