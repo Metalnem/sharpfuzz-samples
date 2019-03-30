@@ -8,8 +8,10 @@ namespace System.Private.CoreLib.Fuzz
 {
 	public class Program
 	{
-		private static readonly Dictionary<string, Action<string>> aflFuzz =
-			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+		private static readonly byte[] buffer = new byte[1_000_000];
+
+		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
+			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "Convert.ToInt32", Convert_ToInt32 },
 				{ "DateTime.TryParse", DateTime_TryParse },
@@ -36,22 +38,28 @@ namespace System.Private.CoreLib.Fuzz
 				return;
 			}
 
-			var fuzzer = aflFuzz[args[1]];
-			var path = args[0];
-
 			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
-				fuzzer(path);
+				using (var stream = File.OpenRead(args[0]))
+				{
+					var fuzzer = aflFuzz[args[1]];
+					fuzzer(stream);
+				}
 			}
 			else
 			{
-				Fuzzer.Run(() => fuzzer(path));
+				using (var stream = Console.OpenStandardInput())
+				{
+					var fuzzer = aflFuzz[args[0]];
+					Fuzzer.Run(() => fuzzer(stream));
+				}
 			}
 		}
 
-		private static void Convert_ToInt32(string path)
+		private static void Convert_ToInt32(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 			var fromBases = new int[] { 2, 8, 10, 16 };
 
 			foreach (var fromBase in fromBases)
@@ -79,9 +87,10 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void DateTime_TryParse(string path)
+		private static void DateTime_TryParse(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
 			if (DateTime.TryParse(text, out var dt1))
 			{
@@ -111,9 +120,10 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void Decimal_Multiply(string path)
+		private static void Decimal_Multiply(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
 			if (Decimal.TryParse(text, out var d))
 			{
@@ -130,9 +140,10 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void Double_TryParse(string path)
+		private static void Double_TryParse(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
 			if (Double.TryParse(text, out var d1))
 			{
@@ -162,15 +173,18 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void Guid_TryParse(string path)
+		private static void Guid_TryParse(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
+
 			Guid.TryParse(text, out _);
 		}
 
-		private static void IdnMapping_GetAscii(string path)
+		private static void IdnMapping_GetAscii(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 			var mapping = new IdnMapping();
 
 			try
@@ -187,9 +201,10 @@ namespace System.Private.CoreLib.Fuzz
 			catch (ArgumentException) { }
 		}
 
-		private static void TimeSpan_TryParse(string path)
+		private static void TimeSpan_TryParse(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
 			if (TimeSpan.TryParse(text, out var t1))
 			{
@@ -203,24 +218,28 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void UnicodeEncoding_GetString(string path)
+		private static void UnicodeEncoding_GetString(Stream stream)
 		{
-			try
-			{
-				var bytes = File.ReadAllBytes(path);
-				Encoding.Unicode.GetString(bytes);
-			}
-			catch (ArgumentException) { }
+			var bytes = ReadAllBytes(stream);
+			Encoding.Unicode.GetString(bytes);
 		}
 
-		private static void UTF8Encoding_GetString(string path)
+		private static void UTF8Encoding_GetString(Stream stream)
 		{
-			try
+			var bytes = ReadAllBytes(stream);
+			Encoding.UTF8.GetString(bytes);
+		}
+
+		private static byte[] ReadAllBytes(Stream stream)
+		{
+			int size = stream.Read(buffer, 0, buffer.Length);
+
+			if (size == buffer.Length)
 			{
-				var bytes = File.ReadAllBytes(path);
-				Encoding.UTF8.GetString(bytes);
+				throw new Exception();
 			}
-			catch (ArgumentException) { }
+
+			return buffer.AsSpan(0, size).ToArray();
 		}
 	}
 }

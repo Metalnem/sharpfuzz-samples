@@ -23,5 +23,4 @@ afl-fuzz \
 	-o Findings/$target \
 	-t 5000 \
 	-m 10000 \
-	Binaries/$target/System.Private.CoreLib.Fuzz \
-	@@ $target
+	Binaries/$target/System.Private.CoreLib.Fuzz $target
