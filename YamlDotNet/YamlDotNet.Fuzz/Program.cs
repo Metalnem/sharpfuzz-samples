@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using SharpFuzz;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
@@ -10,13 +11,13 @@ namespace YamlDotNet.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenText(args[0]))
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
 					{
-						new YamlStream().Load(file);
+						new YamlStream().Load(reader);
 					}
 				}
 				catch (ArgumentException) { }
