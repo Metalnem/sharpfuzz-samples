@@ -8,8 +8,8 @@ namespace CoreFX.Fuzz
 {
 	public class Program
 	{
-		private static readonly Dictionary<string, Action<string>> aflFuzz =
-			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
+			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "JsonDocument.Parse", JsonDocument_Parse }
 			};
@@ -28,29 +28,31 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			var fuzzer = aflFuzz[args[1]];
-			var path = args[0];
-
 			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
-				fuzzer(path);
+				using (var stream = File.OpenRead(args[0]))
+				{
+					var fuzzer = aflFuzz[args[1]];
+					fuzzer(stream);
+				}
 			}
 			else
 			{
-				Fuzzer.OutOfProcess.Run(() => fuzzer(path));
+				using (var stream = Console.OpenStandardInput())
+				{
+					var fuzzer = aflFuzz[args[0]];
+					Fuzzer.OutOfProcess.Run(() => fuzzer(stream));
+				}
 			}
 		}
 
-		private static void JsonDocument_Parse(string path)
+		private static void JsonDocument_Parse(Stream stream)
 		{
-			using (var file = File.OpenRead(path))
+			try
 			{
-				try
-				{
-					JsonDocument.Parse(file);
-				}
-				catch (JsonReaderException) { }
+				JsonDocument.Parse(stream);
 			}
+			catch (JsonReaderException) { }
 		}
 
 		private static void JsonDocument_Parse(ReadOnlySpan<byte> data)

@@ -5,7 +5,7 @@ cd ../CoreFX.Fuzz
 mkdir -p ../Binaries
 mkdir -p ../Findings
 
-/Users/Metalnem/Temp/dotnet-sdk-latest-osx-x64/dotnet publish -r "$4" -o ../Binaries/"$1"
+/Users/Metalnem/Temp/dotnet-sdk-3.0.100-preview3/dotnet publish -r "$4" -o ../Binaries/"$1"
 sharpfuzz ../Binaries/"$1"/"$2"
 
 cd ..
@@ -17,5 +17,4 @@ afl-fuzz \
 	-t 5000 \
 	-m 10000 \
 	-x "$3" \
-	Binaries/"$1"/CoreFX.Fuzz \
-	@@ "$1"
+	Binaries/"$1"/CoreFX.Fuzz "$1"
