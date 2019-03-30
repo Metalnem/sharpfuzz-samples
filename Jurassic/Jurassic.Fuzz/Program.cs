@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Jint;
 using Jint.Runtime;
 using SharpFuzz;
@@ -10,16 +11,19 @@ namespace Jurassic.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var text = File.ReadAllText(args[0]);
-
-					if (RunJint(text))
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
 					{
-						var engine = new ScriptEngine();
-						engine.Execute(text);
+						var text = reader.ReadToEnd();
+
+						if (RunJint(text))
+						{
+							var engine = new ScriptEngine();
+							engine.Execute(text);
+						}
 					}
 				}
 				catch (JavaScriptException) { }
