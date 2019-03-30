@@ -1,5 +1,4 @@
-﻿using System.IO;
-using SharpFuzz;
+﻿using SharpFuzz;
 
 namespace SixLabors.ImageSharp.Fuzz
 {
@@ -7,16 +6,11 @@ namespace SixLabors.ImageSharp.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var bytes = File.ReadAllBytes(args[0]);
-
-					bytes[0] = 0xff;
-					bytes[1] = 0xd8;
-
-					Image.Load(bytes);
+					Image.Load(stream);
 				}
 				catch (ImageFormatException) { }
 			});
