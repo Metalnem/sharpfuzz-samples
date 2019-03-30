@@ -11,14 +11,19 @@ namespace MongoDB.Bson.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					using (var bson = new BsonBinaryReader(file))
+					using (var memory = new MemoryStream())
 					{
-						BsonSerializer.Deserialize(bson, typeof(object));
+						stream.CopyTo(memory);
+						memory.Seek(0, SeekOrigin.Begin);
+
+						using (var bson = new BsonBinaryReader(memory))
+						{
+							BsonSerializer.Deserialize(bson, typeof(object));
+						}
 					}
 				}
 				catch (ArgumentOutOfRangeException) { }
