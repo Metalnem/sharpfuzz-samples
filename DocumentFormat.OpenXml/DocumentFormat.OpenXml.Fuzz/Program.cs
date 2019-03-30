@@ -10,11 +10,11 @@ namespace DocumentFormat.OpenXml.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					SpreadsheetDocument.Open(args[0], false);
+					SpreadsheetDocument.Open(stream, false);
 				}
 				catch (ArgumentException) { }
 				catch (FileFormatException) { }
