@@ -6,9 +6,9 @@ namespace HtmlAgilityPack.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
-				new HtmlDocument().Load(args[0]);
+				new HtmlDocument().Load(stream);
 			});
 		}
 	}
