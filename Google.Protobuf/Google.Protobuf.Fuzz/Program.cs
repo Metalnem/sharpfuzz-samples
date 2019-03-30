@@ -19,21 +19,25 @@ namespace Google.Protobuf.Fuzz
 
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
-				var bytes = File.ReadAllBytes(args[0]);
-
-				foreach (var parser in parsers)
+				using (var memory = new MemoryStream())
 				{
-					try
+					stream.CopyTo(memory);
+
+					foreach (var parser in parsers)
 					{
-						parser.ParseFrom(bytes);
+						try
+						{
+							memory.Seek(0, SeekOrigin.Begin);
+							parser.ParseFrom(memory);
+						}
+						catch (ArgumentException) { }
+						catch (IndexOutOfRangeException) { }
+						catch (InvalidOperationException) { }
+						catch (InvalidProtocolBufferException) { }
+						catch (OutOfMemoryException) { }
 					}
-					catch (ArgumentException) { }
-					catch (IndexOutOfRangeException) { }
-					catch (InvalidOperationException) { }
-					catch (InvalidProtocolBufferException) { }
-					catch (OutOfMemoryException) { }
 				}
 			});
 		}
