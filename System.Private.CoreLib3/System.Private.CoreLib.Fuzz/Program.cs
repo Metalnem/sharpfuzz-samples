@@ -29,21 +29,16 @@ namespace System.Private.CoreLib.Fuzz
 				return;
 			}
 
-			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
+			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
 			{
-				using (var stream = File.OpenRead(args[0]))
-				{
-					var fuzzer = aflFuzz[args[1]];
-					fuzzer(stream);
-				}
+				Fuzzer.Run(aflFuzz[args[0]]);
+				return;
 			}
-			else
+
+			using (var stream = Console.OpenStandardInput())
 			{
-				using (var stream = Console.OpenStandardInput())
-				{
-					var fuzzer = aflFuzz[args[0]];
-					Fuzzer.Run(() => fuzzer(stream));
-				}
+				var fuzzer = aflFuzz[args[0]];
+				fuzzer(stream);
 			}
 		}
 
