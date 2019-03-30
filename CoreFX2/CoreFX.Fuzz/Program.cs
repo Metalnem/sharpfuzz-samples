@@ -327,16 +327,15 @@ namespace CoreFX.Fuzz
 
 		private static void HttpUtility_UrlEncode(Stream stream)
 		{
-			using (var reader = new StreamReader(stream))
-			{
-				var text = reader.ReadToEnd();
-				var encoded = HttpUtility.UrlEncode(text);
-				var decoded = HttpUtility.UrlDecode(encoded);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
-				if (text != decoded)
-				{
-					throw new Exception();
-				}
+			var encoded = HttpUtility.UrlEncode(text);
+			var decoded = HttpUtility.UrlDecode(encoded);
+
+			if (text != decoded)
+			{
+				throw new Exception();
 			}
 		}
 
@@ -368,14 +367,12 @@ namespace CoreFX.Fuzz
 
 		private static void Regex_Match(Stream stream)
 		{
-			using (var reader = new StreamReader(stream))
-			{
-				var text = reader.ReadToEnd();
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
-				foreach (var regex in regexes.Value)
-				{
-					regex.Match(text);
-				}
+			foreach (var regex in regexes.Value)
+			{
+				regex.Match(text);
 			}
 		}
 
