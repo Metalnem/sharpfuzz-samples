@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using AngleSharp.Parser.Html;
 using SharpFuzz;
 
@@ -9,14 +8,11 @@ namespace AngleSharp.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					{
-						new HtmlParser().Parse(file);
-					}
+					new HtmlParser().Parse(stream);
 				}
 				catch (InvalidOperationException) { }
 			});
