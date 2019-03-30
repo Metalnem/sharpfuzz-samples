@@ -115,21 +115,16 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
+			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
 			{
-				using (var stream = File.OpenRead(args[0]))
-				{
-					var fuzzer = aflFuzz[args[1]];
-					fuzzer(stream);
-				}
+				Fuzzer.OutOfProcess.Run(aflFuzz[args[0]]);
+				return;
 			}
-			else
+
+			using (var stream = Console.OpenStandardInput())
 			{
-				using (var stream = Console.OpenStandardInput())
-				{
-					var fuzzer = aflFuzz[args[0]];
-					Fuzzer.OutOfProcess.Run(() => fuzzer(stream));
-				}
+				var fuzzer = aflFuzz[args[0]];
+				fuzzer(stream);
 			}
 		}
 
@@ -351,13 +346,18 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void PEReader_GetMetadataReader(Stream stream)
+		private static unsafe void PEReader_GetMetadataReader(Stream stream)
 		{
+			var bytes = ReadAllBytes(stream);
+
 			try
 			{
-				using (var pe = new PEReader(stream))
+				fixed (byte* ptr = bytes)
 				{
-					pe.GetMetadataReader();
+					using (var pe = new PEReader(ptr, bytes.Length))
+					{
+						pe.GetMetadataReader();
+					}
 				}
 			}
 			catch (BadImageFormatException) { }
@@ -519,7 +519,7 @@ namespace CoreFX.Fuzz
 		{
 			try
 			{
-				using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
+				using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, true))
 				{
 					foreach (var entry in archive.Entries) { }
 				}
