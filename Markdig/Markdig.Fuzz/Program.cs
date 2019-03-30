@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using SharpFuzz;
 
 namespace Markdig.Fuzz
@@ -7,11 +8,14 @@ namespace Markdig.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
-				var text = File.ReadAllText(args[0]);
-				var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-				Markdown.ToHtml(text, pipeline);
+				using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+				{
+					var text = reader.ReadToEnd();
+					var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+					Markdown.ToHtml(text, pipeline);
+				}
 			});
 		}
 	}
