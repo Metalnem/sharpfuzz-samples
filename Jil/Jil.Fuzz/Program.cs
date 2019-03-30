@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using SharpFuzz;
 
 namespace Jil.Fuzz
@@ -8,13 +9,13 @@ namespace Jil.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenText(args[0]))
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
 					{
-						JSON.DeserializeDynamic(file);
+						JSON.DeserializeDynamic(reader);
 					}
 				}
 				catch (ArgumentException) { }
