@@ -11,7 +11,7 @@ coreLibDir=$3
 
 shift 3
 
-/Users/Metalnem/Temp/dotnet-sdk-latest-osx-x64/dotnet publish -r $platform -o ../Binaries/$target
+/Users/Metalnem/Temp/dotnet-sdk-3.0.100-preview3/dotnet publish -r $platform -o ../Binaries/$target
 cp ../$coreLibDir/System.Private.CoreLib.dll ../Binaries/$target
 sharpfuzz ../Binaries/$target/System.Private.CoreLib.dll $@
 
@@ -23,5 +23,4 @@ afl-fuzz \
 	-o Findings/$target \
 	-t 5000 \
 	-m 10000 \
-	Binaries/$target/System.Private.CoreLib.Fuzz \
-	@@ $target
+	Binaries/$target/System.Private.CoreLib.Fuzz $target

@@ -7,8 +7,10 @@ namespace System.Private.CoreLib.Fuzz
 {
 	public class Program
 	{
-		private static readonly Dictionary<string, Action<string>> aflFuzz =
-			new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+		private static readonly byte[] buffer = new byte[1_000_000];
+
+		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
+			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "Double.TryParse", Double_TryParse }
 			};
@@ -27,22 +29,28 @@ namespace System.Private.CoreLib.Fuzz
 				return;
 			}
 
-			var fuzzer = aflFuzz[args[1]];
-			var path = args[0];
-
 			if (Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null)
 			{
-				fuzzer(path);
+				using (var stream = File.OpenRead(args[0]))
+				{
+					var fuzzer = aflFuzz[args[1]];
+					fuzzer(stream);
+				}
 			}
 			else
 			{
-				Fuzzer.Run(() => fuzzer(path));
+				using (var stream = Console.OpenStandardInput())
+				{
+					var fuzzer = aflFuzz[args[0]];
+					Fuzzer.Run(() => fuzzer(stream));
+				}
 			}
 		}
 
-		private static void Double_TryParse(string path)
+		private static void Double_TryParse(Stream stream)
 		{
-			var text = File.ReadAllText(path);
+			var bytes = ReadAllBytes(stream);
+			var text = Encoding.UTF8.GetString(bytes);
 
 			if (Double.TryParse(text, out var d1))
 			{
@@ -70,6 +78,18 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static byte[] ReadAllBytes(Stream stream)
+		{
+			int size = stream.Read(buffer, 0, buffer.Length);
+
+			if (size == buffer.Length)
+			{
+				throw new Exception();
+			}
+
+			return buffer.AsSpan(0, size).ToArray();
 		}
 	}
 }
