@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using SharpFuzz;
 
 namespace MessagePack.Fuzz
@@ -8,14 +7,11 @@ namespace MessagePack.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					{
-						MessagePackSerializer.Deserialize<dynamic>(file);
-					}
+					MessagePackSerializer.Deserialize<dynamic>(stream);
 				}
 				catch (ArgumentException) { }
 				catch (IndexOutOfRangeException) { }
