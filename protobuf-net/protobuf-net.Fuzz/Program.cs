@@ -24,14 +24,11 @@ namespace protobuf_net.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					{
-						Serializer.Deserialize<Person>(file);
-					}
+					Serializer.Deserialize<Person>(stream);
 				}
 				catch (ArgumentException) { }
 				catch (IndexOutOfRangeException) { }

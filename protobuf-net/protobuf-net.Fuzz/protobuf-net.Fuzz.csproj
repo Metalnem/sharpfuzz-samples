@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="1.1.0" />
+    <PackageReference Include="SharpFuzz" Version="1.4.0" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>protobuf_net.Fuzz</RootNamespace>
   </PropertyGroup>
 
