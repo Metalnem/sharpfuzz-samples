@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using SharpFuzz;
 
 namespace ExCSS.Fuzz
@@ -8,15 +7,12 @@ namespace ExCSS.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					{
-						var parser = new StylesheetParser();
-						parser.Parse(file);
-					}
+					var parser = new StylesheetParser();
+					parser.Parse(stream);
 				}
 				catch (ArgumentOutOfRangeException) { }
 				catch (ParseException) { }
