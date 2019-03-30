@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Esprima;
 using SharpFuzz;
 
@@ -9,13 +10,16 @@ namespace esprima.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var text = File.ReadAllText(args[0]);
-					var parser = new JavaScriptParser(text);
-					parser.ParseProgram();
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					{
+						var text = reader.ReadToEnd();
+						var parser = new JavaScriptParser(text);
+						parser.ParseProgram();
+					}
 				}
 				catch (ArgumentOutOfRangeException) { }
 				catch (IndexOutOfRangeException) { }
