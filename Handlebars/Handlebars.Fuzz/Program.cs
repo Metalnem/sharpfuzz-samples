@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using HandlebarsDotNet;
 using SharpFuzz;
 
@@ -24,14 +25,17 @@ namespace Handlebars.Fuzz
 				Doubles = new List<double> { 1.1, 2.2, 3.3 }
 			};
 
-			Fuzzer.OutOfProcess.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var text = File.ReadAllText(args[0]);
-					var template = HandlebarsDotNet.Handlebars.Compile(text);
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					{
+						var text = reader.ReadToEnd();
+						var template = HandlebarsDotNet.Handlebars.Compile(text);
 
-					template(user);
+						template(user);
+					}
 				}
 				catch (ArgumentException) { }
 				catch (HandlebarsException) { }
