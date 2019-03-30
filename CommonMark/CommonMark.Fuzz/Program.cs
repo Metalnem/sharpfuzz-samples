@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using SharpFuzz;
 
 namespace CommonMark.Fuzz
@@ -7,12 +8,15 @@ namespace CommonMark.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					var text = File.ReadAllText(args[0]);
-					CommonMarkConverter.Convert(text);
+					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					using (var writer = new StringWriter())
+					{
+						CommonMarkConverter.Convert(reader, writer);
+					}
 				}
 				catch (CommonMarkException) { }
 			});
