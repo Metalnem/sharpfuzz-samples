@@ -8,7 +8,7 @@ namespace AngleSharp.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(stream =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{

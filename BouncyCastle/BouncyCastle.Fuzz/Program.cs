@@ -9,14 +9,19 @@ namespace BouncyCastle.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					using (var asn = new Asn1InputStream(file))
+					using (var memory = new MemoryStream())
 					{
-						while (asn.ReadObject() != null) { }
+						stream.CopyTo(memory);
+						memory.Seek(0, SeekOrigin.Begin);
+
+						using (var asn = new Asn1InputStream(memory))
+						{
+							while (asn.ReadObject() != null) { }
+						}
 					}
 				}
 				catch (ArgumentException) { }
