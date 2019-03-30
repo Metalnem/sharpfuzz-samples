@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using SharpFuzz;
 
 namespace MsgPack.Fuzz
@@ -8,14 +7,11 @@ namespace MsgPack.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.Run(() =>
+			Fuzzer.OutOfProcess.Run(stream =>
 			{
 				try
 				{
-					using (var file = File.OpenRead(args[0]))
-					{
-						Unpacking.UnpackObject(file);
-					}
+					Unpacking.UnpackObject(stream);
 				}
 				catch (InvalidMessagePackStreamException) { }
 				catch (MessageNotSupportedException) { }
