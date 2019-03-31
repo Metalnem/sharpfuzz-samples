@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="1.4.0" />
+    <PackageReference Include="SharpFuzz" Version="1.4.1" />
     <PackageReference Include="Microsoft.Private.CoreFx.NETCoreApp" Version="4.5.220-servicing-27414-05" />
   </ItemGroup>
 
