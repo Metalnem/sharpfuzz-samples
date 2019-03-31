@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Text;
-using SharpFuzz;
+﻿using SharpFuzz;
 
 namespace WebMarkupMin.Core.Fuzz
 {
@@ -8,13 +6,9 @@ namespace WebMarkupMin.Core.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(stream =>
+			Fuzzer.OutOfProcess.Run(text =>
 			{
-				using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
-				{
-					var text = reader.ReadToEnd();
-					new HtmlMinifier().Minify(text);
-				}
+				new HtmlMinifier().Minify(text);
 			});
 		}
 	}

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Scriban.Syntax;
 using SharpFuzz;
 
@@ -25,16 +23,12 @@ namespace Scriban.Fuzz
 				Doubles = new List<double> { 1.1, 2.2, 3.3 }
 			};
 
-			Fuzzer.OutOfProcess.Run(stream =>
+			Fuzzer.OutOfProcess.Run(text =>
 			{
 				try
 				{
-					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
-					{
-						var text = reader.ReadToEnd();
-						var template = Template.ParseLiquid(text);
-						template.Render(user);
-					}
+					var template = Template.ParseLiquid(text);
+					template.Render(user);
 				}
 				catch (ArgumentException) { }
 				catch (InvalidCastException) { }

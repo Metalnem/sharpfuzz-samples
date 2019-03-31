@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using SharpFuzz;
 
 namespace Newtonsoft.Json.Fuzz
@@ -9,15 +7,11 @@ namespace Newtonsoft.Json.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(stream =>
+			Fuzzer.OutOfProcess.Run(text =>
 			{
 				try
 				{
-					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
-					{
-						var text = reader.ReadToEnd();
-						JsonConvert.DeserializeObject(text);
-					}
+					JsonConvert.DeserializeObject(text);
 				}
 				catch (ArgumentException) { }
 				catch (JsonReaderException) { }
