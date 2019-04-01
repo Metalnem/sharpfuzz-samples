@@ -6,5 +6,5 @@
 [Oo]bj/
 
 # afl-fuzz
-*/Binaries/
-*/Findings/
+Binaries/
+Findings/

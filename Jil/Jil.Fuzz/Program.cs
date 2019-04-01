@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using SharpFuzz;
 
 namespace Jil.Fuzz
@@ -13,7 +12,7 @@ namespace Jil.Fuzz
 			{
 				try
 				{
-					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					using (var reader = new StreamReader(stream))
 					{
 						JSON.DeserializeDynamic(reader);
 					}

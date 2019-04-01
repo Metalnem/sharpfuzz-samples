@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using SharpFuzz;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
@@ -15,7 +14,7 @@ namespace YamlDotNet.Fuzz
 			{
 				try
 				{
-					using (var reader = new StreamReader(stream, Encoding.UTF8, false, 4096, true))
+					using (var reader = new StreamReader(stream))
 					{
 						new YamlStream().Load(reader);
 					}

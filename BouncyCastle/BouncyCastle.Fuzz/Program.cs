@@ -13,15 +13,9 @@ namespace BouncyCastle.Fuzz
 			{
 				try
 				{
-					using (var memory = new MemoryStream())
+					using (var asn = new Asn1InputStream(stream))
 					{
-						stream.CopyTo(memory);
-						memory.Seek(0, SeekOrigin.Begin);
-
-						using (var asn = new Asn1InputStream(memory))
-						{
-							while (asn.ReadObject() != null) { }
-						}
+						while (asn.ReadObject() != null) { }
 					}
 				}
 				catch (ArgumentException) { }
