@@ -41,17 +41,6 @@ namespace CoreFX.Fuzz
 
 		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
 
-		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
-			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
-				{ "Utf8Parser.TryParseDateTime", Utf8Parser_TryParseDateTime },
-				{ "Utf8Parser.TryParseDouble", Utf8Parser_TryParseDouble },
-				{ "Utf8Parser.TryParseTimeSpan", Utf8Parser_TryParseTimeSpan },
-				{ "XmlReader.Create", XmlReader_Create },
-				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize }
-			};
-
 		private static readonly Lazy<List<Regex>> regexes = new Lazy<List<Regex>>(() => new List<Regex>
 		{
 			new Regex("([(][(](?<t>[^)]+)[)])?(?<a>[^[]+)[[](?<ia>.+)[]][)]?", RegexOptions.None),
@@ -91,8 +80,16 @@ namespace CoreFX.Fuzz
 		{
 			if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
 			{
-				Fuzzer.LibFuzzer.Run(libFuzzer[args[0]]);
-				return;
+				switch (args[0])
+				{
+					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
+					case "Utf8Parser.TryParseDateTime": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDateTime); return;
+					case "Utf8Parser.TryParseDouble": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDouble); return;
+					case "Utf8Parser.TryParseTimeSpan": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseTimeSpan); return;
+					case "XmlReader.Create": Fuzzer.LibFuzzer.Run(XmlReader_Create); return;
+					case "XmlSerializer.Deserialize": Fuzzer.LibFuzzer.Run(XmlSerializer_Deserialize); return;
+					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
+				}
 			}
 
 			switch (args[0])
