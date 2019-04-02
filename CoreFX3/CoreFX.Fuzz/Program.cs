@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using SharpFuzz;
@@ -8,36 +7,21 @@ namespace CoreFX.Fuzz
 {
 	public class Program
 	{
-		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
-			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ "JsonDocument.Parse", JsonDocument_Parse }
-			};
-
-		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
-			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ "JsonDocument.Parse", JsonDocument_Parse }
-			};
-
 		public static void Main(string[] args)
 		{
 			if (!(Environment.GetEnvironmentVariable("__LIBFUZZER_SHM_ID") is null))
 			{
-				Fuzzer.LibFuzzer.Run(libFuzzer[args[0]]);
-				return;
+				switch (args[0])
+				{
+					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
+					default: throw new ArgumentException($"Unknown fuzzing function: args[0]");
+				}
 			}
 
-			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
+			switch (args[0])
 			{
-				Fuzzer.OutOfProcess.Run(aflFuzz[args[0]]);
-				return;
-			}
-
-			using (var stream = Console.OpenStandardInput())
-			{
-				var fuzzer = aflFuzz[args[0]];
-				fuzzer(stream);
+				case "JsonDocument.Parse": Fuzzer.OutOfProcess.Run(JsonDocument_Parse); return;
+				default: throw new ArgumentException($"Unknown fuzzing function: args[0]");
 			}
 		}
 

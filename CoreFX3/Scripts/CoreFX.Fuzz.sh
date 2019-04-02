@@ -5,7 +5,7 @@ cd ../CoreFX.Fuzz
 mkdir -p ../Binaries
 mkdir -p ../Findings
 
-/Users/Metalnem/Temp/dotnet-sdk-3.0.100-preview3/dotnet publish -r "$3" -o ../Binaries/"$1"
+dotnet publish -r "$3" -o ../Binaries/"$1"
 sharpfuzz ../Binaries/"$1"/"$2"
 
 cd ..
