@@ -11,7 +11,7 @@ coreLibDir=$3
 
 shift 3
 
-/Users/Metalnem/Temp/dotnet-sdk-3.0.100-preview3/dotnet publish -r $platform -o ../Binaries/$target
+dotnet publish -r $platform -o ../Binaries/$target
 cp ../$coreLibDir/System.Private.CoreLib.dll ../Binaries/$target
 sharpfuzz ../Binaries/$target/System.Private.CoreLib.dll $@
 

@@ -23,14 +23,14 @@ namespace System.Private.CoreLib.Fuzz
 
 			switch (args[0])
 			{
-				case "Convert.ToInt32": Fuzzer.OutOfProcess.Run(Convert_ToInt32); return;
-				case "DateTime.TryParse": Fuzzer.OutOfProcess.Run(DateTime_TryParse); return;
-				case "Decimal.Multiply": Fuzzer.OutOfProcess.Run(Decimal_Multiply); return;
-				case "Double.TryParse": Fuzzer.OutOfProcess.Run(Double_TryParse); return;
-				case "Guid.TryParse": Fuzzer.OutOfProcess.Run(Guid_TryParse); return;
-				case "TimeSpan.TryParse": Fuzzer.OutOfProcess.Run(TimeSpan_TryParse); return;
-				case "UnicodeEncoding.GetString": Fuzzer.OutOfProcess.Run(UnicodeEncoding_GetString); return;
-				case "UTF8Encoding.GetString": Fuzzer.OutOfProcess.Run(UTF8Encoding_GetString); return;
+				case "Convert.ToInt32": Fuzzer.Run(Convert_ToInt32); return;
+				case "DateTime.TryParse": Fuzzer.Run(DateTime_TryParse); return;
+				case "Decimal.Multiply": Fuzzer.Run(Decimal_Multiply); return;
+				case "Double.TryParse": Fuzzer.Run(Double_TryParse); return;
+				case "Guid.TryParse": Fuzzer.Run(Guid_TryParse); return;
+				case "TimeSpan.TryParse": Fuzzer.Run(TimeSpan_TryParse); return;
+				case "UnicodeEncoding.GetString": Fuzzer.Run(UnicodeEncoding_GetString); return;
+				case "UTF8Encoding.GetString": Fuzzer.Run(UTF8Encoding_GetString); return;
 				default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 			}
 		}
