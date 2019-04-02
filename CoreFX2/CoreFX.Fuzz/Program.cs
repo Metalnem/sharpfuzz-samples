@@ -23,7 +23,7 @@ namespace CoreFX.Fuzz
 {
 	public class Program
 	{
-		private static readonly byte[] byteBuffer = new byte[1_000_000];
+		private static readonly byte[] byteBuffer = new byte[10_000_000];
 		private static readonly char[] charBuffer = new char[8192];
 
 		private static readonly string[] formats = new string[] { "C", "D", "G", "N", "R" };
@@ -40,26 +40,6 @@ namespace CoreFX.Fuzz
 			"bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
 
 		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
-
-		private static readonly Dictionary<string, Action<Stream>> aflFuzz =
-			new Dictionary<string, Action<Stream>>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ "BigInteger.DivRem", BigInteger_DivRem },
-				{ "BigInteger.ModPow", BigInteger_ModPow },
-				{ "BigInteger.TryParse", BigInteger_TryParse },
-				{ "BinaryFormatter.Deserialize", BinaryFormatter_Deserialize },
-				{ "DataContractJsonSerializer.ReadObject", DataContractJsonSerializer_ReadObject },
-				{ "DataContractSerializer.ReadObject", DataContractSerializer_ReadObject },
-				{ "HttpUtility.UrlEncode", HttpUtility_UrlEncode },
-				{ "PEReader.GetMetadataReader", PEReader_GetMetadataReader },
-				{ "Regex.Match", Regex_Match },
-				{ "Utf8Parser.TryParseDateTime", Utf8Parser_TryParseDateTime },
-				{ "Utf8Parser.TryParseDouble", Utf8Parser_TryParseDouble },
-				{ "Utf8Parser.TryParseTimeSpan", Utf8Parser_TryParseTimeSpan },
-				{ "XmlReader.Create", XmlReader_Create },
-				{ "XmlSerializer.Deserialize", XmlSerializer_Deserialize },
-				{ "ZipArchive.Entries", ZipArchive_Entries }
-			};
 
 		private static readonly Dictionary<string, ReadOnlySpanAction> libFuzzer =
 			new Dictionary<string, ReadOnlySpanAction>(StringComparer.OrdinalIgnoreCase)
@@ -115,18 +95,29 @@ namespace CoreFX.Fuzz
 				return;
 			}
 
-			if (!(Environment.GetEnvironmentVariable("__AFL_SHM_ID") is null))
+			switch (args[0])
 			{
-				Fuzzer.OutOfProcess.Run(aflFuzz[args[0]]);
-				return;
-			}
-
-			using (var stream = Console.OpenStandardInput())
-			{
-				var fuzzer = aflFuzz[args[0]];
-				fuzzer(stream);
+				case "BigInteger.DivRem": Run(BigInteger_DivRem); return;
+				case "BigInteger.ModPow": Run(BigInteger_ModPow); return;
+				case "BigInteger.TryParse": Run(BigInteger_TryParse); return;
+				case "BinaryFormatter.Deserialize": Run(BinaryFormatter_Deserialize); return;
+				case "DataContractJsonSerializer.ReadObject": Run(DataContractJsonSerializer_ReadObject); return;
+				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
+				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
+				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
+				case "Regex.Match": Run(Regex_Match); return;
+				case "Utf8Parser.TryParseDateTime": Run(Utf8Parser_TryParseDateTime); return;
+				case "Utf8Parser.TryParseDouble": Run(Utf8Parser_TryParseDouble); return;
+				case "Utf8Parser.TryParseTimeSpan": Run(Utf8Parser_TryParseTimeSpan); return;
+				case "XmlReader.Create": Run(XmlReader_Create); return;
+				case "XmlSerializer.Deserialize": Run(XmlSerializer_Deserialize); return;
+				case "ZipArchive.Entries": Run(ZipArchive_Entries); return;
+				default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 			}
 		}
+
+		private static void Run(Action<Stream> action) => Fuzzer.OutOfProcess.Run(action);
+		private static void Run(Action<String> action) => Fuzzer.OutOfProcess.Run(action);
 
 		private static void BigInteger_DivRem(Stream stream)
 		{
@@ -320,11 +311,8 @@ namespace CoreFX.Fuzz
 			catch (XmlException) { }
 		}
 
-		private static void HttpUtility_UrlEncode(Stream stream)
+		private static void HttpUtility_UrlEncode(string text)
 		{
-			var bytes = ReadAllBytes(stream);
-			var text = Encoding.UTF8.GetString(bytes);
-
 			var encoded = HttpUtility.UrlEncode(text);
 			var decoded = HttpUtility.UrlDecode(encoded);
 
@@ -365,11 +353,8 @@ namespace CoreFX.Fuzz
 			catch (OverflowException) { }
 		}
 
-		private static void Regex_Match(Stream stream)
+		private static void Regex_Match(string text)
 		{
-			var bytes = ReadAllBytes(stream);
-			var text = Encoding.UTF8.GetString(bytes);
-
 			foreach (var regex in regexes.Value)
 			{
 				regex.Match(text);
@@ -519,7 +504,7 @@ namespace CoreFX.Fuzz
 		{
 			try
 			{
-				using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, true))
+				using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
 				{
 					foreach (var entry in archive.Entries) { }
 				}
