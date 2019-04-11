@@ -1,6 +1,7 @@
 # SharpFuzz samples
 
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AngleSharp)
+- [ASP.NET Core](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AspNetCore)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
 - [CommonMark](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CommonMark)
 - [CoreFX (.NET Core 2.2)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX2)
