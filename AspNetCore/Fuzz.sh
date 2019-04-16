@@ -7,4 +7,8 @@ rm -rf Findings
 dotnet publish -r "$1" -o Binaries
 sharpfuzz Binaries/Microsoft.AspNetCore.Server.Kestrel.Core.dll
 
-afl-fuzz -i Testcases -o Findings -t 5000 -m 10000 -x Http.dict Binaries/AspNetCore.Fuzz
+./libfuzzer-proto-dotnet \
+	-timeout=5 \
+	-dict=Http.dict \
+	--target_path=Binaries/AspNetCore.Fuzz \
+	Testcases

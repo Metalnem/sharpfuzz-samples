@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Google.Protobuf" Version="3.7.0" />
     <PackageReference Include="SharpFuzz" Version="1.4.3" />
   </ItemGroup>
 
