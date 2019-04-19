@@ -36,34 +36,30 @@ namespace AspNetCore.Fuzz
 
 		private static void Fuzz()
 		{
-			using (var client = new TcpClient("localhost", 5000))
-			using (var stream = client.GetStream())
+			Fuzzer.LibFuzzer.Run(span =>
 			{
-				Fuzzer.LibFuzzer.Run(span =>
+				Request request = null;
+
+				try
 				{
-					Request request = null;
+					request = Request.Parser.ParseFrom(span.ToArray());
+				}
+				catch { }
 
-					try
-					{
-						request = Request.Parser.ParseFrom(span.ToArray());
-					}
-					catch { }
-
-					if (request != null)
-					{
-						Fuzz(request, stream);
-					}
-				});
-			}
+				if (request != null)
+				{
+					Fuzz(request);
+				}
+			});
 		}
 
-		private static void Fuzz(Request request, NetworkStream stream)
+		private static void Fuzz(Request request)
 		{
 			var sb = new StringBuilder();
 
 			sb.Append($"{GetMethod(request.Method)} {GetPath(request.Path)} HTTP/1.1\r\n");
 			sb.Append($"Host: {GetHost(request.Host)}\r\n");
-			sb.Append($"Connection: Keep-Alive\r\n");
+			sb.Append($"Connection: close\r\n");
 
 			foreach (var header in request.Headers)
 			{
@@ -83,8 +79,12 @@ namespace AspNetCore.Fuzz
 			bytes.CopyTo(clientBuffer, 0);
 			request.Body.CopyTo(clientBuffer, bytes.Length);
 
-			stream.Write(clientBuffer, 0, bytes.Length + request.Body.Length);
-			stream.Read(clientBuffer, 0, clientBuffer.Length);
+			using (var client = new TcpClient("localhost", 5000))
+			using (var stream = client.GetStream())
+			{
+				stream.Write(clientBuffer, 0, bytes.Length + request.Body.Length);
+				stream.Read(clientBuffer, 0, clientBuffer.Length);
+			}
 		}
 
 		private static string GetMethod(Method method)
