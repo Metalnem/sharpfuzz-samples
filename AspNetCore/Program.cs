@@ -16,8 +16,8 @@ namespace AspNetCore.Fuzz
 {
 	public class Program
 	{
-		private static readonly byte[] clientBuffer = new byte[1_000];
-		private static readonly byte[] serverBuffer = new byte[1_000_000];
+		private static readonly byte[] clientBuffer = new byte[10_000_000];
+		private static readonly byte[] serverBuffer = new byte[10_000_000];
 
 		public static unsafe void Main(string[] args)
 		{
