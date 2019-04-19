@@ -10,16 +10,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Libfuzzer.Http;
 using SharpFuzz;
+using System.Threading;
 
 namespace AspNetCore.Fuzz
 {
 	public class Program
 	{
-		private static readonly byte[] buffer = new byte[1024];
+		private static readonly byte[] clientBuffer = new byte[1_000];
+		private static readonly byte[] serverBuffer = new byte[1_000_000];
 
 		public static unsafe void Main(string[] args)
 		{
-			fixed (byte* trace = new byte[65536])
+			fixed (byte* trace = new byte[65_536])
 			{
 				SharpFuzz.Common.Trace.SharedMem = trace;
 
@@ -34,40 +36,39 @@ namespace AspNetCore.Fuzz
 
 		private static void Fuzz()
 		{
-			Fuzzer.LibFuzzer.Run(span =>
+			using (var client = new TcpClient("localhost", 5000))
+			using (var stream = client.GetStream())
 			{
-				Request request = null;
-
-				try
+				Fuzzer.LibFuzzer.Run(span =>
 				{
-					request = Request.Parser.ParseFrom(span.ToArray());
-				}
-				catch { }
+					Request request = null;
 
-				if (request != null)
-				{
-					var bytes = GetBytes(request);
-
-					using (var client = new TcpClient("localhost", 5000))
-					using (var stream = client.GetStream())
+					try
 					{
-						stream.Write(bytes, 0, bytes.Length);
-						stream.Read(buffer, 0, buffer.Length);
+						request = Request.Parser.ParseFrom(span.ToArray());
 					}
-				}
-			});
+					catch { }
+
+					if (request != null)
+					{
+						Fuzz(request, stream);
+					}
+				});
+			}
 		}
 
-		private static byte[] GetBytes(Request request)
+		private static void Fuzz(Request request, NetworkStream stream)
 		{
 			var sb = new StringBuilder();
 
 			sb.Append($"{GetMethod(request.Method)} {GetPath(request.Path)} HTTP/1.1\r\n");
 			sb.Append($"Host: {GetHost(request.Host)}\r\n");
+			sb.Append($"Connection: Keep-Alive\r\n");
 
 			foreach (var header in request.Headers)
 			{
 				if (!String.Equals(header.Name, "Host", StringComparison.OrdinalIgnoreCase)
+					&& !String.Equals(header.Name, "Connection", StringComparison.OrdinalIgnoreCase)
 					&& !String.IsNullOrEmpty(header.Name)
 					&& !String.IsNullOrEmpty(header.Value))
 				{
@@ -77,14 +78,13 @@ namespace AspNetCore.Fuzz
 
 			sb.Append($"Content-Length: {request.Body.Length}\r\n\r\n");
 
-			var bytes1 = Encoding.UTF8.GetBytes(sb.ToString());
-			var bytes2 = request.Body.ToByteArray();
+			var bytes = Encoding.UTF8.GetBytes(sb.ToString());
 
-			var bytes = new byte[bytes1.Length + bytes2.Length];
-			bytes1.CopyTo(bytes, 0);
-			bytes2.CopyTo(bytes, bytes1.Length);
+			bytes.CopyTo(clientBuffer, 0);
+			request.Body.CopyTo(clientBuffer, bytes.Length);
 
-			return bytes;
+			stream.Write(clientBuffer, 0, bytes.Length + request.Body.Length);
+			stream.Read(clientBuffer, 0, clientBuffer.Length);
 		}
 
 		private static string GetMethod(Method method)
@@ -111,7 +111,12 @@ namespace AspNetCore.Fuzz
 		{
 			public void Configure(IApplicationBuilder app, IApplicationLifetime lifetime)
 			{
-				app.Run(async context => await context.Response.WriteAsync(String.Empty));
+				app.Run(async context =>
+				{
+					await context.Request.Body.ReadAsync(serverBuffer);
+					await context.Response.WriteAsync(String.Empty);
+				});
+
 				lifetime.ApplicationStarted.Register(() => Task.Run((Action)Fuzz));
 			}
 		}
