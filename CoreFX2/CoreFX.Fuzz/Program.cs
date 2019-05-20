@@ -13,6 +13,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
@@ -83,6 +84,7 @@ namespace CoreFX.Fuzz
 				switch (args[0])
 				{
 					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
+					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
 					case "Utf8Parser.TryParseDateTime": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDateTime); return;
 					case "Utf8Parser.TryParseDouble": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDouble); return;
 					case "Utf8Parser.TryParseTimeSpan": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseTimeSpan); return;
@@ -101,6 +103,7 @@ namespace CoreFX.Fuzz
 				case "DataContractJsonSerializer.ReadObject": Run(DataContractJsonSerializer_ReadObject); return;
 				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
 				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
+				case "JsonDocument.Parse": Fuzzer.OutOfProcess.Run(JsonDocument_Parse); return;
 				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
 				case "Regex.Match": Run(Regex_Match); return;
 				case "Utf8Parser.TryParseDateTime": Run(Utf8Parser_TryParseDateTime); return;
@@ -329,6 +332,24 @@ namespace CoreFX.Fuzz
 			{
 				throw new Exception();
 			}
+		}
+
+		private static void JsonDocument_Parse(Stream stream)
+		{
+			try
+			{
+				JsonDocument.Parse(stream);
+			}
+			catch (JsonException) { }
+		}
+
+		private static void JsonDocument_Parse(ReadOnlySpan<byte> data)
+		{
+			try
+			{
+				JsonDocument.Parse(data.ToArray());
+			}
+			catch (JsonException) { }
 		}
 
 		private static unsafe void PEReader_GetMetadataReader(Stream stream)

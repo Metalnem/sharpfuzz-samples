@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SharpFuzz" Version="1.4.3" />
-    <PackageReference Include="Microsoft.Private.CoreFx.NETCoreApp" Version="4.5.220-servicing-27414-05" />
+    <PackageReference Include="Microsoft.Private.CoreFx.NETCoreApp" Version="4.6.0-preview6.19268.5" />
   </ItemGroup>
 
   <PropertyGroup>
