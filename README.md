@@ -1,10 +1,16 @@
 # SharpFuzz samples
 
+## .NET Core
+
+- [CoreFX](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX)
+- [System.Private.CoreLib (.NET Core 2.2)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib2)
+- [System.Private.CoreLib (.NET Core 3.0)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib3)
+
+## NuGet
+
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AngleSharp)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
 - [CommonMark](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CommonMark)
-- [CoreFX (.NET Core 2.2)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX2)
-- [CoreFX (.NET Core 3.0)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX3)
 - [DocumentFormat.OpenXml](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DocumentFormat.OpenXml)
 - [DotLiquid](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DotLiquid)
 - [esprima](https://github.com/Metalnem/sharpfuzz-samples/tree/master/esprima)
@@ -25,7 +31,5 @@
 - [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/protobuf-net)
 - [Scriban](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Scriban)
 - [SixLabors.ImageSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/SixLabors.ImageSharp)
-- [System.Private.CoreLib (.NET Core 2.2)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib2)
-- [System.Private.CoreLib (.NET Core 3.0)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib3)
 - [WebMarkupMin.Core](https://github.com/Metalnem/sharpfuzz-samples/tree/master/WebMarkupMin.Core)
 - [YamlDotNet](https://github.com/Metalnem/sharpfuzz-samples/tree/master/YamlDotNet)
