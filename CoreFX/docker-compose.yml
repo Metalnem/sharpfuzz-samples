@@ -5,6 +5,12 @@ services:
     environment:
       - TARGET_DLL=System.Web.HttpUtility.dll
       - TARGET_FUNCTION=HttpUtility.UrlEncode
+  jsondocument.parse:
+    build: .
+    environment:
+      - TARGET_DICTIONARY=json.dict
+      - TARGET_DLL=System.Text.Json.dll
+      - TARGET_FUNCTION=JsonDocument.Parse
   pereader.getmetadatareader:
     build: .
     environment:

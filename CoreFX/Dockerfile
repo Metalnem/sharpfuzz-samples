@@ -21,14 +21,8 @@ COPY CoreFX.Fuzz/Program.cs ./
 RUN dotnet publish -r linux-x64 --no-restore -c release -o out
 
 COPY --from=afl-env /app/afl-2.52b ./afl/
+COPY run.sh ./
 COPY Testcases ./testcases/
 
 ENV AFL_SKIP_BIN_CHECK=true
-
-CMD sharpfuzz out/"$TARGET_DLL" \
-	&& ./afl/afl-fuzz \
-	-i testcases/"$TARGET_FUNCTION" \
-	-o findings \
-	-t 5000 \
-	-m 10000 \
-	./out/CoreFX.Fuzz "$TARGET_FUNCTION"
+CMD ./run.sh
