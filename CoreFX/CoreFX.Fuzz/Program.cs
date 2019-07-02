@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.Json;
@@ -34,13 +33,6 @@ namespace CoreFX.Fuzz
 
 		private static readonly int[] squareThresholds = new int[] { 4, 32, Int32.MaxValue };
 		private static readonly int[] reducerThresholds = new int[] { 0, 32, Int32.MaxValue };
-
-		private const string headerString =
-			"AAEAAAD/////AQAAAAAAAAAMAgAAAEJDb3JlRlguRnV6eiwgVmVyc2lvbj" +
-			"0xLjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPW51" +
-			"bGwFAQAAABdDb3JlRlguRnV6ei5Qcm9ncmFtK0JpbgMAAAABQQFCAUM=";
-
-		private static readonly byte[] headerBytes = Convert.FromBase64String(headerString);
 
 		private static readonly Lazy<List<Regex>> regexes = new Lazy<List<Regex>>(() => new List<Regex>
 		{
@@ -85,9 +77,6 @@ namespace CoreFX.Fuzz
 				{
 					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
 					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
-					case "Utf8Parser.TryParseDateTime": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDateTime); return;
-					case "Utf8Parser.TryParseDouble": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDouble); return;
-					case "Utf8Parser.TryParseTimeSpan": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseTimeSpan); return;
 					case "XmlReader.Create": Fuzzer.LibFuzzer.Run(XmlReader_Create); return;
 					case "XmlSerializer.Deserialize": Fuzzer.LibFuzzer.Run(XmlSerializer_Deserialize); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
@@ -99,16 +88,12 @@ namespace CoreFX.Fuzz
 				case "BigInteger.DivRem": Run(BigInteger_DivRem); return;
 				case "BigInteger.ModPow": Run(BigInteger_ModPow); return;
 				case "BigInteger.TryParse": Run(BigInteger_TryParse); return;
-				case "BinaryFormatter.Deserialize": Run(BinaryFormatter_Deserialize); return;
 				case "DataContractJsonSerializer.ReadObject": Run(DataContractJsonSerializer_ReadObject); return;
 				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
 				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
 				case "JsonDocument.Parse": Fuzzer.OutOfProcess.Run(JsonDocument_Parse); return;
 				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
 				case "Regex.Match": Run(Regex_Match); return;
-				case "Utf8Parser.TryParseDateTime": Run(Utf8Parser_TryParseDateTime); return;
-				case "Utf8Parser.TryParseDouble": Run(Utf8Parser_TryParseDouble); return;
-				case "Utf8Parser.TryParseTimeSpan": Run(Utf8Parser_TryParseTimeSpan); return;
 				case "XmlReader.Create": Run(XmlReader_Create); return;
 				case "XmlSerializer.Deserialize": Run(XmlSerializer_Deserialize); return;
 				case "ZipArchive.Entries": Run(ZipArchive_Entries); return;
@@ -253,39 +238,6 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BinaryFormatter_Deserialize(Stream stream)
-		{
-			var formatter = new BinaryFormatter();
-
-			try
-			{
-				var bytes = ReadAllBytes(stream);
-				var buffer = new byte[headerBytes.Length + bytes.Length];
-
-				Array.Copy(headerBytes, buffer, headerBytes.Length);
-				Array.Copy(bytes, 0, buffer, headerBytes.Length, bytes.Length);
-
-				using (var memory = new MemoryStream(buffer))
-				{
-					formatter.Deserialize(memory);
-				}
-			}
-			catch (ArgumentOutOfRangeException) { }
-			catch (ArrayTypeMismatchException) { }
-			catch (DecoderFallbackException) { }
-			catch (ArgumentException) { }
-			catch (FileLoadException) { }
-			catch (FormatException) { }
-			catch (IndexOutOfRangeException) { }
-			catch (InvalidCastException) { }
-			catch (IOException) { }
-			catch (MemberAccessException) { }
-			catch (NullReferenceException) { }
-			catch (OutOfMemoryException) { }
-			catch (OverflowException) { }
-			catch (SerializationException) { }
-		}
-
 		private static void DataContractJsonSerializer_ReadObject(Stream stream)
 		{
 			try
@@ -376,89 +328,6 @@ namespace CoreFX.Fuzz
 			foreach (var regex in regexes.Value)
 			{
 				regex.Match(text);
-			}
-		}
-
-		private static void Utf8Parser_TryParseDateTime(Stream stream)
-		{
-			Utf8Parser_TryParseDateTime(ReadAllBytes(stream));
-		}
-
-		private static void Utf8Parser_TryParseDateTime(ReadOnlySpan<byte> data)
-		{
-			Span<byte> to = stackalloc byte[256];
-
-			if (Utf8Parser.TryParse(data, out DateTime dt1, out _))
-			{
-				var format = 'O';
-
-				if (!Utf8Formatter.TryFormat(dt1, to, out int written, format))
-				{
-					throw new Exception();
-				}
-
-				if (!Utf8Parser.TryParse(to.Slice(0, written), out DateTime dt2, out _, format))
-				{
-					throw new Exception();
-				}
-
-				if (dt1 != dt2)
-				{
-					throw new Exception();
-				}
-			}
-		}
-
-		private static void Utf8Parser_TryParseDouble(Stream stream)
-		{
-			Utf8Parser_TryParseDouble(ReadAllBytes(stream));
-		}
-
-		private static void Utf8Parser_TryParseDouble(ReadOnlySpan<byte> data)
-		{
-			Span<byte> to = stackalloc byte[256];
-
-			if (Utf8Parser.TryParse(data, out double d1, out _))
-			{
-				if (!Utf8Formatter.TryFormat(d1, to, out int written))
-				{
-					throw new Exception();
-				}
-
-				if (!Utf8Parser.TryParse(to.Slice(0, written), out double d2, out _))
-				{
-					throw new Exception();
-				}
-			}
-		}
-
-		private static void Utf8Parser_TryParseTimeSpan(Stream stream)
-		{
-			Utf8Parser_TryParseTimeSpan(ReadAllBytes(stream));
-		}
-
-		private static void Utf8Parser_TryParseTimeSpan(ReadOnlySpan<byte> data)
-		{
-			Span<byte> to = stackalloc byte[256];
-
-			if (Utf8Parser.TryParse(data, out TimeSpan t1, out _))
-			{
-				var format = 'c';
-
-				if (!Utf8Formatter.TryFormat(t1, to, out int written, format))
-				{
-					throw new Exception();
-				}
-
-				if (!Utf8Parser.TryParse(to.Slice(0, written), out TimeSpan t2, out _, format))
-				{
-					throw new Exception();
-				}
-
-				if (t1 != t2)
-				{
-					throw new Exception();
-				}
 			}
 		}
 

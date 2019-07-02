@@ -1,0 +1,17 @@
+version: '3'
+services:
+  httputility.urlencode:
+    build: .
+    environment:
+      - TARGET_DLL=System.Web.HttpUtility.dll
+      - TARGET_FUNCTION=HttpUtility.UrlEncode
+  pereader.getmetadatareader:
+    build: .
+    environment:
+      - TARGET_DLL=System.Reflection.Metadata.dll
+      - TARGET_FUNCTION=PEReader.GetMetadataReader
+  regex.match:
+    build: .
+    environment:
+      - TARGET_DLL=System.Text.RegularExpressions.dll
+      - TARGET_FUNCTION=Regex.Match
