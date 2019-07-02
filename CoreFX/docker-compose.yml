@@ -1,5 +1,32 @@
 version: '3'
 services:
+  biginteger.divrem:
+    build: .
+    environment:
+      - TARGET_DLL=System.Runtime.Numerics.dll
+      - TARGET_FUNCTION=BigInteger.DivRem
+  biginteger.modpow:
+    build: .
+    environment:
+      - TARGET_DLL=System.Runtime.Numerics.dll
+      - TARGET_FUNCTION=BigInteger.ModPow
+  biginteger.tryparse:
+    build: .
+    environment:
+      - TARGET_DLL=System.Runtime.Numerics.dll
+      - TARGET_FUNCTION=BigInteger.TryParse
+  datacontractjsonserializer.readobject:
+    build: .
+    environment:
+      - TARGET_DICTIONARY=json.dict
+      - TARGET_DLL=System.Private.DataContractSerialization.dll
+      - TARGET_FUNCTION=DataContractJsonSerializer.ReadObject
+  datacontractserializer.readobject:
+    build: .
+    environment:
+      - TARGET_DICTIONARY=xml.dict
+      - TARGET_DLL=System.Private.DataContractSerialization.dll
+      - TARGET_FUNCTION=DataContractSerializer.ReadObject
   httputility.urlencode:
     build: .
     environment:
@@ -21,3 +48,20 @@ services:
     environment:
       - TARGET_DLL=System.Text.RegularExpressions.dll
       - TARGET_FUNCTION=Regex.Match
+  xmlreader.create:
+    build: .
+    environment:
+      - TARGET_DICTIONARY=xml.dict
+      - TARGET_DLL=System.Private.Xml.dll
+      - TARGET_FUNCTION=XmlReader.Create
+  xmlserializer.deserialize:
+    build: .
+    environment:
+      - TARGET_DICTIONARY=xml.dict
+      - TARGET_DLL=System.Private.Xml.dll
+      - TARGET_FUNCTION=XmlSerializer.Deserialize
+  ziparchive.entries:
+    build: .
+    environment:
+      - TARGET_DLL=System.IO.Compression.dll
+      - TARGET_FUNCTION=ZipArchive.Entries
