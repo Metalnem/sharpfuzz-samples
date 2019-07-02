@@ -21,7 +21,8 @@ COPY CoreFX.Fuzz/Program.cs ./
 RUN dotnet publish -r linux-x64 --no-restore -c release -o out
 
 COPY --from=afl-env /app/afl-2.52b ./afl/
-COPY run.sh ./
+COPY afl-fuzz/run.sh ./
+COPY Dictionaries ./dictionaries/
 COPY Testcases ./testcases/
 
 ENV AFL_SKIP_BIN_CHECK=true

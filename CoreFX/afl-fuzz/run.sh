@@ -8,13 +8,13 @@ if [ -z "$TARGET_DICTIONARY" ]; then
 		-o findings \
 		-t 5000 \
 		-m 10000 \
-		./out/CoreFX.Fuzz "$TARGET_FUNCTION"
+		out/CoreFX.Fuzz "$TARGET_FUNCTION"
 else
 	./afl/afl-fuzz \
 		-i testcases/"$TARGET_FUNCTION" \
 		-o findings \
 		-t 5000 \
 		-m 10000 \
-		-x ./afl/dictionaries/"$TARGET_DICTIONARY" \
-		./out/CoreFX.Fuzz "$TARGET_FUNCTION"
+		-x dictionaries/"$TARGET_DICTIONARY" \
+		out/CoreFX.Fuzz "$TARGET_FUNCTION"
 fi

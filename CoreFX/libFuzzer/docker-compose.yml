@@ -3,14 +3,14 @@ services:
   httputility.urlencode:
     build:
       context: ..
-      dockerfile: LibFuzzer/Dockerfile
+      dockerfile: libFuzzer/Dockerfile
     environment:
       - TARGET_DLL=System.Web.HttpUtility.dll
       - TARGET_FUNCTION=HttpUtility.UrlEncode
   jsondocument.parse:
     build:
       context: ..
-      dockerfile: LibFuzzer/Dockerfile
+      dockerfile: libFuzzer/Dockerfile
     environment:
       - TARGET_DICTIONARY=json.dict
       - TARGET_DLL=System.Text.Json.dll
@@ -18,7 +18,7 @@ services:
   xmlreader.create:
     build:
       context: ..
-      dockerfile: LibFuzzer/Dockerfile
+      dockerfile: libFuzzer/Dockerfile
     environment:
       - TARGET_DICTIONARY=xml.dict
       - TARGET_DLL=System.Private.Xml.dll
@@ -26,7 +26,7 @@ services:
   xmlserializer.deserialize:
     build:
       context: ..
-      dockerfile: LibFuzzer/Dockerfile
+      dockerfile: libFuzzer/Dockerfile
     environment:
       - TARGET_DICTIONARY=xml.dict
       - TARGET_DLL=System.Private.Xml.dll
