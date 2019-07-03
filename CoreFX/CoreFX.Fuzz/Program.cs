@@ -339,6 +339,11 @@ namespace CoreFX.Fuzz
 
 		private static unsafe void PEReader_GetMetadataReader(ReadOnlySpan<byte> data)
 		{
+			if (data.Length == 0)
+			{
+				return;
+			}
+
 			try
 			{
 				fixed (byte* ptr = data)

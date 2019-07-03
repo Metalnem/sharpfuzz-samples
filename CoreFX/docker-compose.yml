@@ -1,91 +1,67 @@
 version: '3'
 services:
   biginteger.divrem:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Runtime.Numerics.dll
       - TARGET_FUNCTION=BigInteger.DivRem
   biginteger.modpow:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Runtime.Numerics.dll
       - TARGET_FUNCTION=BigInteger.ModPow
   biginteger.tryparse:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Runtime.Numerics.dll
       - TARGET_FUNCTION=BigInteger.TryParse
   datacontractjsonserializer.readobject:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DICTIONARY=json.dict
       - TARGET_DLL=System.Private.DataContractSerialization.dll
       - TARGET_FUNCTION=DataContractJsonSerializer.ReadObject
   datacontractserializer.readobject:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DICTIONARY=xml.dict
       - TARGET_DLL=System.Private.DataContractSerialization.dll
       - TARGET_FUNCTION=DataContractSerializer.ReadObject
   httputility.urlencode:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Web.HttpUtility.dll
       - TARGET_FUNCTION=HttpUtility.UrlEncode
   jsondocument.parse:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DICTIONARY=json.dict
       - TARGET_DLL=System.Text.Json.dll
       - TARGET_FUNCTION=JsonDocument.Parse
   pereader.getmetadatareader:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Reflection.Metadata.dll
       - TARGET_FUNCTION=PEReader.GetMetadataReader
   regex.match:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.Text.RegularExpressions.dll
       - TARGET_FUNCTION=Regex.Match
   xmlreader.create:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DICTIONARY=xml.dict
       - TARGET_DLL=System.Private.Xml.dll
       - TARGET_FUNCTION=XmlReader.Create
   xmlserializer.deserialize:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DICTIONARY=xml.dict
       - TARGET_DLL=System.Private.Xml.dll
       - TARGET_FUNCTION=XmlSerializer.Deserialize
   ziparchive.entries:
-    build:
-      context: ..
-      dockerfile: afl-fuzz/Dockerfile
+    build: .
     environment:
       - TARGET_DLL=System.IO.Compression.dll
       - TARGET_FUNCTION=ZipArchive.Entries
