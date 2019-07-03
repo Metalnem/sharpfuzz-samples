@@ -32,5 +32,6 @@ COPY run.sh ./
 COPY Dictionaries ./dictionaries/
 COPY Testcases ./testcases/
 
+VOLUME /app/findings
 ENV AFL_SKIP_BIN_CHECK=true
 CMD /bin/bash ./run.sh

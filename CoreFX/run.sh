@@ -1,7 +1,6 @@
 #/bin/bash
 
 sharpfuzz out/"$TARGET_DLL"
-mkdir findings
 
 if [ "${TARGET_ENGINE,,}" == "libfuzzer" ]; then
 	if [ -z "$TARGET_DICTIONARY" ]; then
