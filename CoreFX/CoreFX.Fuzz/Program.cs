@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -75,10 +74,18 @@ namespace CoreFX.Fuzz
 			{
 				switch (args[0])
 				{
+					case "BigInteger.DivRem": Fuzzer.LibFuzzer.Run(BigInteger_DivRem); return;
+					case "BigInteger.ModPow": Fuzzer.LibFuzzer.Run(BigInteger_ModPow); return;
+					case "BigInteger.TryParse": Fuzzer.LibFuzzer.Run(BigInteger_TryParse); return;
+					case "DataContractJsonSerializer.ReadObject": Fuzzer.LibFuzzer.Run(DataContractJsonSerializer_ReadObject); return;
+					case "DataContractSerializer.ReadObject": Fuzzer.LibFuzzer.Run(DataContractSerializer_ReadObject); return;
 					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
 					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
+					case "PEReader.GetMetadataReader": Fuzzer.LibFuzzer.Run(PEReader_GetMetadataReader); return;
+					case "Regex.Match": Fuzzer.LibFuzzer.Run(Regex_Match); return;
 					case "XmlReader.Create": Fuzzer.LibFuzzer.Run(XmlReader_Create); return;
 					case "XmlSerializer.Deserialize": Fuzzer.LibFuzzer.Run(XmlSerializer_Deserialize); return;
+					case "ZipArchive.Entries": Fuzzer.LibFuzzer.Run(ZipArchive_Entries); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 				}
 			}
@@ -91,7 +98,7 @@ namespace CoreFX.Fuzz
 				case "DataContractJsonSerializer.ReadObject": Run(DataContractJsonSerializer_ReadObject); return;
 				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
 				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
-				case "JsonDocument.Parse": Fuzzer.OutOfProcess.Run(JsonDocument_Parse); return;
+				case "JsonDocument.Parse": Run(JsonDocument_Parse); return;
 				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
 				case "Regex.Match": Run(Regex_Match); return;
 				case "XmlReader.Create": Run(XmlReader_Create); return;
@@ -104,23 +111,21 @@ namespace CoreFX.Fuzz
 		private static void Run(Action<Stream> action) => Fuzzer.OutOfProcess.Run(action);
 		private static void Run(Action<String> action) => Fuzzer.OutOfProcess.Run(action);
 
-		private static void BigInteger_DivRem(Stream stream)
+		private static void BigInteger_DivRem(ReadOnlySpan<byte> data)
 		{
-			var bytes = ReadAllBytes(stream);
-
-			if (bytes.Length == 0 || bytes.Length > 8192)
+			if (data.Length == 0 || data.Length > 8192)
 			{
 				return;
 			}
 
-			var span = bytes.AsSpan(1);
+			var span = data.Slice(1);
 			var len = span.Length;
 
-			var l1 = ((bytes[0] & 0x3f) * len) / 0x3f;
+			var l1 = ((data[0] & 0x3f) * len) / 0x3f;
 			var l2 = len - l1;
 
-			var s1 = bytes[0] & 0x40;
-			var s2 = bytes[0] & 0x80;
+			var s1 = data[0] & 0x40;
+			var s2 = data[0] & 0x80;
 
 			var a = new BigInteger(span.Slice(0, l1).ToArray());
 			var b = new BigInteger(span.Slice(l1).ToArray());
@@ -153,24 +158,27 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BigInteger_ModPow(Stream stream)
+		private static void BigInteger_DivRem(Stream stream)
 		{
-			var bytes = ReadAllBytes(stream);
+			BigInteger_DivRem(ReadAllBytes(stream));
+		}
 
-			if (bytes.Length <= 2 || bytes.Length > 8192)
+		private static void BigInteger_ModPow(ReadOnlySpan<byte> data)
+		{
+			if (data.Length <= 2 || data.Length > 8192)
 			{
 				return;
 			}
 
-			var span = bytes.AsSpan(3);
+			var span = data.Slice(3);
 			var len = span.Length;
 
-			var l1 = (bytes[0] * len) / 255;
-			var l2 = (bytes[1] * (len - l1)) / 255;
+			var l1 = (data[0] * len) / 255;
+			var l2 = (data[1] * (len - l1)) / 255;
 			var l3 = len - l1 - l2;
 
-			var sa = bytes[2] & 1;
-			var sc = bytes[2] & 2;
+			var sa = data[2] & 1;
+			var sc = data[2] & 2;
 
 			var a = new BigInteger(span.Slice(0, l1).ToArray());
 			var b = new BigInteger(span.Slice(l1, l2).ToArray());
@@ -217,10 +225,14 @@ namespace CoreFX.Fuzz
 			}
 		}
 
-		private static void BigInteger_TryParse(Stream stream)
+		private static void BigInteger_ModPow(Stream stream)
 		{
-			var bytes = ReadAllBytes(stream);
-			var number = new BigInteger(bytes);
+			BigInteger_ModPow(ReadAllBytes(stream));
+		}
+
+		private static void BigInteger_TryParse(ReadOnlySpan<byte> data)
+		{
+			var number = new BigInteger(data);
 
 			foreach (var format in formats)
 			{
@@ -238,6 +250,19 @@ namespace CoreFX.Fuzz
 			}
 		}
 
+		private static void BigInteger_TryParse(Stream stream)
+		{
+			BigInteger_TryParse(ReadAllBytes(stream));
+		}
+
+		private static void DataContractJsonSerializer_ReadObject(ReadOnlySpan<byte> data)
+		{
+			using (var stream = new MemoryStream(data.ToArray()))
+			{
+				DataContractJsonSerializer_ReadObject(stream);
+			}
+		}
+
 		private static void DataContractJsonSerializer_ReadObject(Stream stream)
 		{
 			try
@@ -249,6 +274,14 @@ namespace CoreFX.Fuzz
 			catch (IndexOutOfRangeException) { }
 			catch (SerializationException) { }
 			catch (XmlException) { }
+		}
+
+		private static void DataContractSerializer_ReadObject(ReadOnlySpan<byte> data)
+		{
+			using (var stream = new MemoryStream(data.ToArray()))
+			{
+				DataContractSerializer_ReadObject(stream);
+			}
 		}
 
 		private static void DataContractSerializer_ReadObject(Stream stream)
@@ -304,15 +337,13 @@ namespace CoreFX.Fuzz
 			catch (JsonException) { }
 		}
 
-		private static unsafe void PEReader_GetMetadataReader(Stream stream)
+		private static unsafe void PEReader_GetMetadataReader(ReadOnlySpan<byte> data)
 		{
-			var bytes = ReadAllBytes(stream);
-
 			try
 			{
-				fixed (byte* ptr = bytes)
+				fixed (byte* ptr = data)
 				{
-					using (var pe = new PEReader(ptr, bytes.Length))
+					using (var pe = new PEReader(ptr, data.Length))
 					{
 						pe.GetMetadataReader();
 					}
@@ -321,6 +352,16 @@ namespace CoreFX.Fuzz
 			catch (BadImageFormatException) { }
 			catch (InvalidOperationException) { }
 			catch (OverflowException) { }
+		}
+
+		private static void PEReader_GetMetadataReader(Stream stream)
+		{
+			PEReader_GetMetadataReader(ReadAllBytes(stream));
+		}
+
+		private static void Regex_Match(ReadOnlySpan<byte> data)
+		{
+			Regex_Match(Encoding.UTF8.GetString(data));
 		}
 
 		private static void Regex_Match(string text)
@@ -385,6 +426,14 @@ namespace CoreFX.Fuzz
 			catch (IndexOutOfRangeException) { }
 			catch (InvalidOperationException) { }
 			catch (XmlException) { }
+		}
+
+		private static void ZipArchive_Entries(ReadOnlySpan<byte> data)
+		{
+			using (var stream = new MemoryStream(data.ToArray()))
+			{
+				ZipArchive_Entries(stream);
+			}
 		}
 
 		private static void ZipArchive_Entries(Stream stream)
