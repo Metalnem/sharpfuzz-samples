@@ -1,0 +1,7 @@
+version: '3'
+services:
+  double.tryparse:
+    build: .
+    environment:
+      - TARGET_FUNCTION=Double.TryParse
+      - TARGET_PREFIX=System.Number

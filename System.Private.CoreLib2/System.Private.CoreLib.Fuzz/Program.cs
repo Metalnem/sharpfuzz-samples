@@ -17,6 +17,7 @@ namespace System.Private.CoreLib.Fuzz
 				switch (args[0])
 				{
 					case "DateTime.TryParse": Fuzzer.LibFuzzer.Run(DateTime_TryParse); return;
+					case "Double.TryParse": Fuzzer.LibFuzzer.Run(Double_TryParse); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 				}
 			}
@@ -62,23 +63,17 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void DateTime_TryParse(string text)
-		{
-			if (DateTime.TryParse(text, out var dt1))
-			{
-				var s = dt1.ToString("O");
-				var dt2 = DateTime.Parse(s, null, DateTimeStyles.RoundtripKind);
-
-				if (dt1 != dt2)
-				{
-					throw new Exception();
-				}
-			}
-		}
-
 		private static void DateTime_TryParse(ReadOnlySpan<byte> data)
 		{
-			var text = Encoding.UTF8.GetString(data);
+			DateTime_TryParse(Encoding.UTF8.GetString(data));
+		}
+
+		private static void DateTime_TryParse(string text)
+		{
+			if ("NaN".Equals(text, StringComparison.OrdinalIgnoreCase))
+			{
+				return;
+			}
 
 			if (DateTime.TryParse(text, out var dt1))
 			{
@@ -109,24 +104,13 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
-		private static void Double_TryParse(string text)
-		{
-			if (Double.TryParse(text, out var d1))
-			{
-				var s = d1.ToString("G17");
-				var d2 = Double.Parse(s);
-
-				if (d1 != d2)
-				{
-					throw new Exception();
-				}
-			}
-		}
-
 		private static void Double_TryParse(ReadOnlySpan<byte> data)
 		{
-			var text = Encoding.UTF8.GetString(data);
+			Double_TryParse(Encoding.UTF8.GetString(data));
+		}
 
+		private static void Double_TryParse(string text)
+		{
 			if (Double.TryParse(text, out var d1))
 			{
 				var s = d1.ToString("G17");
