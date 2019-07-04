@@ -19,6 +19,8 @@ namespace System.Private.CoreLib.Fuzz
 					case "DateTime.TryParse": Fuzzer.LibFuzzer.Run(DateTime_TryParse); return;
 					case "Double.TryParse": Fuzzer.LibFuzzer.Run(Double_TryParse); return;
 					case "Guid.TryParse": Fuzzer.LibFuzzer.Run(Guid_TryParse); return;
+					case "UnicodeEncoding.GetString": Fuzzer.LibFuzzer.Run(UnicodeEncoding_GetString); return;
+					case "UTF8Encoding.GetString": Fuzzer.LibFuzzer.Run(UTF8Encoding_GetString); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 				}
 			}
@@ -148,16 +150,24 @@ namespace System.Private.CoreLib.Fuzz
 			}
 		}
 
+		private static void UnicodeEncoding_GetString(ReadOnlySpan<byte> data)
+		{
+			Encoding.Unicode.GetString(data);
+		}
+
 		private static void UnicodeEncoding_GetString(Stream stream)
 		{
-			var bytes = ReadAllBytes(stream);
-			Encoding.Unicode.GetString(bytes);
+			UnicodeEncoding_GetString(ReadAllBytes(stream));
+		}
+
+		private static void UTF8Encoding_GetString(ReadOnlySpan<byte> data)
+		{
+			Encoding.UTF8.GetString(data);
 		}
 
 		private static void UTF8Encoding_GetString(Stream stream)
 		{
-			var bytes = ReadAllBytes(stream);
-			Encoding.UTF8.GetString(bytes);
+			UTF8Encoding_GetString(ReadAllBytes(stream));
 		}
 
 		private static byte[] ReadAllBytes(Stream stream)

@@ -10,3 +10,13 @@ services:
     environment:
       - TARGET_FUNCTION=Guid.TryParse
       - TARGET_PREFIX=System.Guid
+  unicodeencoding.getstring:
+    build: .
+    environment:
+      - TARGET_FUNCTION=UnicodeEncoding.GetString
+      - TARGET_PREFIX=System.Text
+  utf8encoding.getstring:
+    build: .
+    environment:
+      - TARGET_FUNCTION=UTF8Encoding.GetString
+      - TARGET_PREFIX=System.Text
