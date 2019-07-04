@@ -5,3 +5,8 @@ services:
     environment:
       - TARGET_FUNCTION=Double.TryParse
       - TARGET_PREFIX=System.Number
+  guid.tryparse:
+    build: .
+    environment:
+      - TARGET_FUNCTION=Guid.TryParse
+      - TARGET_PREFIX=System.Guid

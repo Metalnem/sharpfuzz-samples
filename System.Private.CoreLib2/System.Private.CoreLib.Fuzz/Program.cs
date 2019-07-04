@@ -18,6 +18,7 @@ namespace System.Private.CoreLib.Fuzz
 				{
 					case "DateTime.TryParse": Fuzzer.LibFuzzer.Run(DateTime_TryParse); return;
 					case "Double.TryParse": Fuzzer.LibFuzzer.Run(Double_TryParse); return;
+					case "Guid.TryParse": Fuzzer.LibFuzzer.Run(Guid_TryParse); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 				}
 			}
@@ -121,6 +122,11 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static void Guid_TryParse(ReadOnlySpan<byte> data)
+		{
+			Guid_TryParse(Encoding.UTF8.GetString(data));
 		}
 
 		private static void Guid_TryParse(string text)
