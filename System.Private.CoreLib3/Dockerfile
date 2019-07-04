@@ -1,14 +1,10 @@
-FROM mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-16.04-c103199-20180628134544 AS coreclr-env
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-16.04-c103199-20180628134544 AS build-env
 WORKDIR /coreclr
 
 RUN git clone --progress --verbose https://github.com/dotnet/coreclr.git .
 RUN ./build.sh skiptests skipcrossgen skipnative release
 
-FROM ubuntu:bionic AS afl-env
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y gcc make wget
-
 RUN wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
 RUN tar -xvf afl-latest.tgz
 
@@ -30,9 +26,9 @@ RUN dotnet restore -r linux-x64
 COPY System.Private.CoreLib.Fuzz/Program.cs ./
 RUN dotnet publish -r linux-x64 --no-restore -c release -o out
 
-COPY --from=coreclr-env /coreclr/bin/Product/Linux.x64.Release/IL/System.Private.CoreLib.dll ./out/
-COPY --from=afl-env /app/afl-2.52b ./afl/
-COPY --from=afl-env /app/libfuzzer-dotnet ./libFuzzer/
+COPY --from=build-env /coreclr/bin/Product/Linux.x64.Release/IL/System.Private.CoreLib.dll ./out/
+COPY --from=build-env /app/afl-2.52b ./afl/
+COPY --from=build-env /app/libfuzzer-dotnet ./libFuzzer/
 
 COPY run.sh ./
 COPY Testcases ./testcases/
