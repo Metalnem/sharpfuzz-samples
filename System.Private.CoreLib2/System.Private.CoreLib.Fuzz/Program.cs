@@ -16,9 +16,12 @@ namespace System.Private.CoreLib.Fuzz
 			{
 				switch (args[0])
 				{
+					case "Convert.ToInt32": Fuzzer.LibFuzzer.Run(Convert_ToInt32); return;
 					case "DateTime.TryParse": Fuzzer.LibFuzzer.Run(DateTime_TryParse); return;
+					case "Decimal.Multiply": Fuzzer.LibFuzzer.Run(Decimal_Multiply); return;
 					case "Double.TryParse": Fuzzer.LibFuzzer.Run(Double_TryParse); return;
 					case "Guid.TryParse": Fuzzer.LibFuzzer.Run(Guid_TryParse); return;
+					case "TimeSpan.TryParse": Fuzzer.LibFuzzer.Run(TimeSpan_TryParse); return;
 					case "UnicodeEncoding.GetString": Fuzzer.LibFuzzer.Run(UnicodeEncoding_GetString); return;
 					case "UTF8Encoding.GetString": Fuzzer.LibFuzzer.Run(UTF8Encoding_GetString); return;
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
@@ -37,6 +40,11 @@ namespace System.Private.CoreLib.Fuzz
 				case "UTF8Encoding.GetString": Fuzzer.Run(UTF8Encoding_GetString); return;
 				default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 			}
+		}
+
+		private static void Convert_ToInt32(ReadOnlySpan<byte> data)
+		{
+			Convert_ToInt32(Encoding.UTF8.GetString(data));
 		}
 
 		private static void Convert_ToInt32(string text)
@@ -73,11 +81,6 @@ namespace System.Private.CoreLib.Fuzz
 
 		private static void DateTime_TryParse(string text)
 		{
-			if ("NaN".Equals(text, StringComparison.OrdinalIgnoreCase))
-			{
-				return;
-			}
-
 			if (DateTime.TryParse(text, out var dt1))
 			{
 				var s = dt1.ToString("O");
@@ -88,6 +91,11 @@ namespace System.Private.CoreLib.Fuzz
 					throw new Exception();
 				}
 			}
+		}
+
+		private static void Decimal_Multiply(ReadOnlySpan<byte> data)
+		{
+			Decimal_Multiply(Encoding.UTF8.GetString(data));
 		}
 
 		private static void Decimal_Multiply(string text)
@@ -114,6 +122,11 @@ namespace System.Private.CoreLib.Fuzz
 
 		private static void Double_TryParse(string text)
 		{
+			if ("NaN".Equals(text, StringComparison.OrdinalIgnoreCase))
+			{
+				return;
+			}
+
 			if (Double.TryParse(text, out var d1))
 			{
 				var s = d1.ToString("G17");
@@ -134,6 +147,11 @@ namespace System.Private.CoreLib.Fuzz
 		private static void Guid_TryParse(string text)
 		{
 			Guid.TryParse(text, out _);
+		}
+
+		private static void TimeSpan_TryParse(ReadOnlySpan<byte> data)
+		{
+			TimeSpan_TryParse(Encoding.UTF8.GetString(data));
 		}
 
 		private static void TimeSpan_TryParse(string text)
