@@ -1,6 +1,6 @@
 #/bin/bash
 
-sharpfuzz out/System.Private.CoreLib.dll "$TARGET_PREFIX"
+SHARPFUZZ_PRINT_INSTRUMENTED_TYPES=true sharpfuzz out/System.Private.CoreLib.dll "$TARGET_PREFIXES"
 
 if [ "${TARGET_ENGINE,,}" == "libfuzzer" ]; then
 	./libFuzzer/libfuzzer-dotnet \
