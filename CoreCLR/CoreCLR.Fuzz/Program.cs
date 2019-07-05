@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Buffers.Text;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using SharpFuzz;
@@ -24,6 +25,11 @@ namespace System.Private.CoreLib.Fuzz
 					case "TimeSpan.TryParse": Fuzzer.LibFuzzer.Run(TimeSpan_TryParse); return;
 					case "UnicodeEncoding.GetString": Fuzzer.LibFuzzer.Run(UnicodeEncoding_GetString); return;
 					case "UTF8Encoding.GetString": Fuzzer.LibFuzzer.Run(UTF8Encoding_GetString); return;
+#if NETCOREAPP3_0
+					case "Utf8Parser.TryParseDateTime": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDateTime); return;
+					case "Utf8Parser.TryParseDouble": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseDouble); return;
+					case "Utf8Parser.TryParseTimeSpan": Fuzzer.LibFuzzer.Run(Utf8Parser_TryParseTimeSpan); return;
+#endif
 					default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 				}
 			}
@@ -38,6 +44,11 @@ namespace System.Private.CoreLib.Fuzz
 				case "TimeSpan.TryParse": Fuzzer.Run(TimeSpan_TryParse); return;
 				case "UnicodeEncoding.GetString": Fuzzer.Run(UnicodeEncoding_GetString); return;
 				case "UTF8Encoding.GetString": Fuzzer.Run(UTF8Encoding_GetString); return;
+#if NETCOREAPP3_0
+				case "Utf8Parser.TryParseDateTime": Fuzzer.Run(Utf8Parser_TryParseDateTime); return;
+				case "Utf8Parser.TryParseDouble": Fuzzer.Run(Utf8Parser_TryParseDouble); return;
+				case "Utf8Parser.TryParseTimeSpan": Fuzzer.Run(Utf8Parser_TryParseTimeSpan); return;
+#endif
 				default: throw new ArgumentException($"Unknown fuzzing function: {args[0]}");
 			}
 		}
@@ -122,13 +133,13 @@ namespace System.Private.CoreLib.Fuzz
 
 		private static void Double_TryParse(string text)
 		{
-			if ("NaN".Equals(text, StringComparison.OrdinalIgnoreCase))
-			{
-				return;
-			}
-
 			if (Double.TryParse(text, out var d1))
 			{
+				if (double.IsNaN(d1))
+				{
+					return;
+				}
+
 				var s = d1.ToString("G17");
 				var d2 = Double.Parse(s);
 
@@ -186,6 +197,94 @@ namespace System.Private.CoreLib.Fuzz
 		private static void UTF8Encoding_GetString(Stream stream)
 		{
 			UTF8Encoding_GetString(ReadAllBytes(stream));
+		}
+
+		private static void Utf8Parser_TryParseDateTime(Stream stream)
+		{
+			Utf8Parser_TryParseDateTime(ReadAllBytes(stream));
+		}
+
+		private static void Utf8Parser_TryParseDateTime(ReadOnlySpan<byte> data)
+		{
+			Span<byte> to = stackalloc byte[1024];
+
+			if (Utf8Parser.TryParse(data, out DateTime dt1, out _))
+			{
+				var format = 'O';
+
+				if (!Utf8Formatter.TryFormat(dt1, to, out int written, format))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out DateTime dt2, out _, format))
+				{
+					throw new Exception();
+				}
+
+				if (dt1 != dt2)
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		private static void Utf8Parser_TryParseDouble(Stream stream)
+		{
+			Utf8Parser_TryParseDouble(ReadAllBytes(stream));
+		}
+
+		private static void Utf8Parser_TryParseDouble(ReadOnlySpan<byte> data)
+		{
+			Span<byte> to = stackalloc byte[1024];
+
+			if (Utf8Parser.TryParse(data, out double d1, out _))
+			{
+				if (double.IsNaN(d1))
+				{
+					return;
+				}
+
+				if (!Utf8Formatter.TryFormat(d1, to, out int written))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out double d2, out _))
+				{
+					throw new Exception();
+				}
+			}
+		}
+
+		private static void Utf8Parser_TryParseTimeSpan(Stream stream)
+		{
+			Utf8Parser_TryParseTimeSpan(ReadAllBytes(stream));
+		}
+
+		private static void Utf8Parser_TryParseTimeSpan(ReadOnlySpan<byte> data)
+		{
+			Span<byte> to = stackalloc byte[1024];
+
+			if (Utf8Parser.TryParse(data, out TimeSpan t1, out _))
+			{
+				var format = 'c';
+
+				if (!Utf8Formatter.TryFormat(t1, to, out int written, format))
+				{
+					throw new Exception();
+				}
+
+				if (!Utf8Parser.TryParse(to.Slice(0, written), out TimeSpan t2, out _, format))
+				{
+					throw new Exception();
+				}
+
+				if (t1 != t2)
+				{
+					throw new Exception();
+				}
+			}
 		}
 
 		private static byte[] ReadAllBytes(Stream stream)

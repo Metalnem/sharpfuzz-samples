@@ -40,3 +40,18 @@ services:
     environment:
       - TARGET_FUNCTION=UTF8Encoding.GetString
       - TARGET_PREFIXES=System.Text
+  utf8parser.tryparsedatetime:
+    build: .
+    environment:
+      - TARGET_FUNCTION=Utf8Parser.TryParseDateTime
+      - TARGET_PREFIXES=System.Buffers.Text
+  utf8parser.tryparsedouble:
+    build: .
+    environment:
+      - TARGET_FUNCTION=Utf8Parser.TryParseDouble
+      - TARGET_PREFIXES=System.Buffers.Text
+  utf8parser.tryparsetimespan:
+    build: .
+    environment:
+      - TARGET_FUNCTION=Utf8Parser.TryParseTimeSpan
+      - TARGET_PREFIXES=System.Buffers.Text
