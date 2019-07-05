@@ -34,6 +34,8 @@ COPY --from=build-env /app/libfuzzer-dotnet ./libFuzzer/
 COPY run.sh ./
 COPY Testcases ./testcases/
 
-VOLUME /app/findings
 ENV AFL_SKIP_BIN_CHECK=true
+ENV SHARPFUZZ_PRINT_INSTRUMENTED_TYPES=true
+
+VOLUME /app/findings
 CMD /bin/bash ./run.sh
