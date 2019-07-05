@@ -2,9 +2,8 @@
 
 ## .NET Core
 
+- [CoreCLR](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreCLR)
 - [CoreFX](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CoreFX)
-- [System.Private.CoreLib (.NET Core 2.2)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib2)
-- [System.Private.CoreLib (.NET Core 3.0)](https://github.com/Metalnem/sharpfuzz-samples/tree/master/System.Private.CoreLib3)
 
 ## NuGet
 

@@ -5,7 +5,7 @@ SHARPFUZZ_PRINT_INSTRUMENTED_TYPES=true sharpfuzz out/System.Private.CoreLib.dll
 if [ "${TARGET_ENGINE,,}" == "libfuzzer" ]; then
 	./libFuzzer/libfuzzer-dotnet \
 		-timeout=10 \
-		--target_path=out/System.Private.CoreLib.Fuzz \
+		--target_path=out/CoreCLR.Fuzz \
 		--target_arg="$TARGET_FUNCTION" \
 		findings
 else
@@ -14,5 +14,5 @@ else
 		-o findings \
 		-t 5000 \
 		-m 10000 \
-		out/System.Private.CoreLib.Fuzz "$TARGET_FUNCTION"
+		out/CoreCLR.Fuzz "$TARGET_FUNCTION"
 fi

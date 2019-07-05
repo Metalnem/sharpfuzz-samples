@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-16.04-c103199-2018062813
 WORKDIR /coreclr
 
 RUN git clone --progress --verbose https://github.com/dotnet/coreclr.git .
+RUN git checkout release/2.2
 RUN ./build.sh skiptests skipcrossgen skipnative release
 
 WORKDIR /app
@@ -14,16 +15,16 @@ RUN tar -xvf libfuzzer-dotnet.tar.gz
 WORKDIR afl-2.52b
 RUN make
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-bionic
 WORKDIR /app
 
 ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet tool install --global SharpFuzz.CommandLine
 
-COPY System.Private.CoreLib.Fuzz/System.Private.CoreLib.Fuzz.csproj ./
+COPY CoreCLR.Fuzz/CoreCLR.Fuzz.csproj ./
 RUN dotnet restore -r linux-x64
 
-COPY System.Private.CoreLib.Fuzz/Program.cs ./
+COPY CoreCLR.Fuzz/Program.cs ./
 RUN dotnet publish -r linux-x64 --no-restore -c release -o out
 
 COPY --from=build-env /coreclr/bin/Product/Linux.x64.Release/IL/System.Private.CoreLib.dll ./out/
