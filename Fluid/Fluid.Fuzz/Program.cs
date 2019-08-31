@@ -36,6 +36,7 @@ namespace Fluid.Fuzz
 				catch (ArgumentException) { }
 				catch (DivideByZeroException) { }
 				catch (NullReferenceException) { }
+				catch (OverflowException) { }
 			});
 		}
 	}
