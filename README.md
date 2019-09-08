@@ -8,12 +8,14 @@
 ## NuGet
 
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AngleSharp)
+- [Bond](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Bond)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
 - [CommonMark](https://github.com/Metalnem/sharpfuzz-samples/tree/master/CommonMark)
 - [DocumentFormat.OpenXml](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DocumentFormat.OpenXml)
 - [DotLiquid](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DotLiquid)
 - [esprima](https://github.com/Metalnem/sharpfuzz-samples/tree/master/esprima)
 - [ExCSS](https://github.com/Metalnem/sharpfuzz-samples/tree/master/ExCSS)
+- [Fluid](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Fluid)
 - [Google.Protobuf](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Google.Protobuf)
 - [GraphQL-Parser](https://github.com/Metalnem/sharpfuzz-samples/tree/master/GraphQL-Parser)
 - [Handlebars](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Handlebars)
