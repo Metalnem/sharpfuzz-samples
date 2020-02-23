@@ -98,7 +98,7 @@ namespace CoreFX.Fuzz
 					case "DataContractSerializer.ReadObject": Fuzzer.LibFuzzer.Run(DataContractSerializer_ReadObject); return;
 					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
 					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
-					case "JsonSerialize.Deserialize": Fuzzer.LibFuzzer.Run(JsonSerializer_Deserialize); return;
+					case "JsonSerializer.Deserialize": Fuzzer.LibFuzzer.Run(JsonSerializer_Deserialize); return;
 					case "PEReader.GetMetadataReader": Fuzzer.LibFuzzer.Run(PEReader_GetMetadataReader); return;
 					case "RSA.ImportRSAPrivateKey": Fuzzer.LibFuzzer.Run(RSA_ImportRSAPrivateKey); return;
 					case "Regex.Match": Fuzzer.LibFuzzer.Run(Regex_Match); return;
@@ -118,7 +118,7 @@ namespace CoreFX.Fuzz
 				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
 				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
 				case "JsonDocument.Parse": Run(JsonDocument_Parse); return;
-				case "JsonSerialize.Deserialize": Run(JsonSerializer_Deserialize); return;
+				case "JsonSerializer.Deserialize": Run(JsonSerializer_Deserialize); return;
 				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
 				case "RSA.ImportRSAPrivateKey": Run(RSA_ImportRSAPrivateKey); return;
 				case "Regex.Match": Run(Regex_Match); return;
