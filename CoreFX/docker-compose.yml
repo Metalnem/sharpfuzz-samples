@@ -37,7 +37,7 @@ services:
     environment:
       - TARGET_DICTIONARY=json.dict
       - TARGET_DLL=System.Text.Json.dll
-	  - TARGET_FUNCTION=JsonDocument.Parse
+      - TARGET_FUNCTION=JsonDocument.Parse
   jsonserializer.deserialize:
     build: .
     environment:
