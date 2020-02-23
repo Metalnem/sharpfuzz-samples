@@ -12,7 +12,7 @@ RUN tar -xvf libfuzzer-dotnet.tar.gz
 WORKDIR afl-2.52b
 RUN make
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
 WORKDIR /app
 
 ENV PATH="${PATH}:/root/.dotnet/tools"

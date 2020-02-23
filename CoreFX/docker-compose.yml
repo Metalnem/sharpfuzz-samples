@@ -48,6 +48,11 @@ services:
     environment:
       - TARGET_DLL=System.Text.RegularExpressions.dll
       - TARGET_FUNCTION=Regex.Match
+  rsa.importrsaprivatekey:
+    build: .
+    environment:
+      - TARGET_DLL=System.Security.Cryptography.Algorithms.dll
+      - TARGET_FUNCTION=RSA.ImportRSAPrivateKey
   xmlreader.create:
     build: .
     environment:
