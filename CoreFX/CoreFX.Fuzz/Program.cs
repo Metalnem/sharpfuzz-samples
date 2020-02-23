@@ -10,6 +10,7 @@ using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -41,6 +42,22 @@ namespace CoreFX.Fuzz
 			new Regex("(?<a>[^[]+)[[](?<ia>.+)[]]", RegexOptions.None),
 			new Regex("CN=(.*[^,]+).*", RegexOptions.None)
 		});
+
+		public class JsonObj
+		{
+			public byte A { get; set; } = 123;
+			public int B { get; set; } = 1024;
+			public double C { get; set; } = 3.1415;
+			public DateTime D { get; set; } = new DateTime(2010, 10, 15, 8, 45, 30, 875);
+			public string E { get; set; } = "2.71828";
+			public short[] F { get; set; } = new short[] { 1, 2, 3, 4 };
+			public Dictionary<string, int> G { get; set; } = new Dictionary<string, int>
+			{
+				["10"] = 10,
+				["20"] = 20
+			};
+			public JsonObj H { get; set; }
+		}
 
 		[DataContract]
 		public class Obj
@@ -81,7 +98,9 @@ namespace CoreFX.Fuzz
 					case "DataContractSerializer.ReadObject": Fuzzer.LibFuzzer.Run(DataContractSerializer_ReadObject); return;
 					case "HttpUtility.UrlEncode": Fuzzer.LibFuzzer.Run(HttpUtility_UrlEncode); return;
 					case "JsonDocument.Parse": Fuzzer.LibFuzzer.Run(JsonDocument_Parse); return;
+					case "JsonSerialize.Deserialize": Fuzzer.LibFuzzer.Run(JsonSerializer_Deserialize); return;
 					case "PEReader.GetMetadataReader": Fuzzer.LibFuzzer.Run(PEReader_GetMetadataReader); return;
+					case "RSA.ImportRSAPrivateKey": Fuzzer.LibFuzzer.Run(RSA_ImportRSAPrivateKey); return;
 					case "Regex.Match": Fuzzer.LibFuzzer.Run(Regex_Match); return;
 					case "XmlReader.Create": Fuzzer.LibFuzzer.Run(XmlReader_Create); return;
 					case "XmlSerializer.Deserialize": Fuzzer.LibFuzzer.Run(XmlSerializer_Deserialize); return;
@@ -99,7 +118,9 @@ namespace CoreFX.Fuzz
 				case "DataContractSerializer.ReadObject": Run(DataContractSerializer_ReadObject); return;
 				case "HttpUtility.UrlEncode": Run(HttpUtility_UrlEncode); return;
 				case "JsonDocument.Parse": Run(JsonDocument_Parse); return;
+				case "JsonSerialize.Deserialize": Run(JsonSerializer_Deserialize); return;
 				case "PEReader.GetMetadataReader": Run(PEReader_GetMetadataReader); return;
+				case "RSA.ImportRSAPrivateKey": Run(RSA_ImportRSAPrivateKey); return;
 				case "Regex.Match": Run(Regex_Match); return;
 				case "XmlReader.Create": Run(XmlReader_Create); return;
 				case "XmlSerializer.Deserialize": Run(XmlSerializer_Deserialize); return;
@@ -325,7 +346,7 @@ namespace CoreFX.Fuzz
 			{
 				JsonDocument.Parse(stream);
 			}
-			catch (JsonException) { }
+			catch (Exception) { }
 		}
 
 		private static void JsonDocument_Parse(ReadOnlySpan<byte> data)
@@ -334,7 +355,25 @@ namespace CoreFX.Fuzz
 			{
 				JsonDocument.Parse(data.ToArray());
 			}
-			catch (JsonException) { }
+			catch (Exception) { }
+		}
+
+		private static void JsonSerializer_Deserialize(string text)
+		{
+			try
+			{
+				JsonSerializer.Deserialize<JsonObj>(text, new JsonSerializerOptions { MaxDepth = 3 });
+			}
+			catch (Exception) { }
+		}
+
+		private static void JsonSerializer_Deserialize(ReadOnlySpan<byte> data)
+		{
+			try
+			{
+				JsonSerializer.Deserialize<JsonObj>(data, new JsonSerializerOptions { MaxDepth = 3 });
+			}
+			catch (Exception) { }
 		}
 
 		private static unsafe void PEReader_GetMetadataReader(ReadOnlySpan<byte> data)
@@ -362,6 +401,23 @@ namespace CoreFX.Fuzz
 		private static void PEReader_GetMetadataReader(Stream stream)
 		{
 			PEReader_GetMetadataReader(ReadAllBytes(stream));
+		}
+
+		private static void RSA_ImportRSAPrivateKey(ReadOnlySpan<byte> data)
+		{
+			try
+			{
+				using (var rsa = RSA.Create())
+				{
+					rsa.ImportRSAPrivateKey(data, out _);
+				}
+			}
+			catch (Exception) { }
+		}
+
+		private static void RSA_ImportRSAPrivateKey(Stream stream)
+		{
+			RSA_ImportRSAPrivateKey(ReadAllBytes(stream));
 		}
 
 		private static void Regex_Match(ReadOnlySpan<byte> data)
