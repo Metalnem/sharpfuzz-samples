@@ -8,8 +8,12 @@ namespace Markdig.Fuzz
 		{
 			Fuzzer.OutOfProcess.Run(text =>
 			{
-				var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-				Markdown.ToHtml(text, pipeline);
+				try
+				{
+					var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+					Markdown.ToHtml(text, pipeline);
+				}
+				catch { }
 			});
 		}
 	}
