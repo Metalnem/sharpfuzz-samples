@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bond.Core.CSharp" Version="8.1.0" />
+    <PackageReference Include="Bond.Core.CSharp" Version="9.0.5" />
     <PackageReference Include="SharpFuzz" Version="1.6.2" />
   </ItemGroup>
 
