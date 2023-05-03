@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.22.0" />
-    <PackageReference Include="SharpFuzz" Version="1.6.2" />
+    <PackageReference Include="Markdig" Version="0.31.0" />
+    <PackageReference Include="SharpFuzz" Version="2.0.2" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
 </Project>
