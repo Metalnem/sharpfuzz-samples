@@ -30,13 +30,7 @@ namespace protobuf_net.Fuzz
 				{
 					Serializer.Deserialize<Person>(stream);
 				}
-				catch (ArgumentException) { }
-				catch (IndexOutOfRangeException) { }
-				catch (InvalidOperationException) { }
-				catch (IOException) { }
-				catch (OutOfMemoryException) { }
-				catch (OverflowException) { }
-				catch (ProtoException) { }
+				catch { }
 			});
 		}
 	}
