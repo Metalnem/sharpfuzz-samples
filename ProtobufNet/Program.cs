@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
-using ProtoBuf;
+﻿using ProtoBuf;
 using SharpFuzz;
 
-namespace protobuf_net.Fuzz
+namespace ProtobufNet.Fuzz
 {
 	[ProtoContract]
 	public class Person
