@@ -22,7 +22,6 @@
 - [Jurassic](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Jurassic)
 - [Markdig](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Markdig)
 - [MessagePack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MessagePack)
-- [MongoDB.Bson](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MongoDB.Bson)
 - [MsgPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MsgPack)
 - [Newtonsoft.Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Newtonsoft.Json)
 - [NUglify](https://github.com/Metalnem/sharpfuzz-samples/tree/master/NUglify)
