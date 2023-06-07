@@ -3,7 +3,7 @@ using GraphQLParser;
 using GraphQLParser.Exceptions;
 using SharpFuzz;
 
-namespace GraphQL_Parser.Fuzz
+namespace GraphQL.Parser.Fuzz
 {
 	public class Program
 	{
