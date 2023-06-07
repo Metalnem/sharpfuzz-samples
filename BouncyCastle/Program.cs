@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Org.BouncyCastle.Asn1;
+﻿using Org.BouncyCastle.Asn1;
 using SharpFuzz;
 
 namespace BouncyCastle.Fuzz
@@ -18,12 +16,7 @@ namespace BouncyCastle.Fuzz
 						while (asn.ReadObject() != null) { }
 					}
 				}
-				catch (ArgumentException) { }
-				catch (Asn1Exception) { }
-				catch (Asn1ParsingException) { }
-				catch (InvalidCastException) { }
-				catch (InvalidOperationException) { }
-				catch (IOException) { }
+				catch { }
 			});
 		}
 	}
