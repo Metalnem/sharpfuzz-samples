@@ -26,7 +26,7 @@
 - [MsgPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MsgPack)
 - [Newtonsoft.Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Newtonsoft.Json)
 - [NUglify](https://github.com/Metalnem/sharpfuzz-samples/tree/master/NUglify)
-- [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/protobuf-net)
+- [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/ProtobufNet)
 - [Scriban](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Scriban)
 - [SixLabors.ImageSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/SixLabors.ImageSharp)
 - [WebMarkupMin.Core](https://github.com/Metalnem/sharpfuzz-samples/tree/master/WebMarkupMin.Core)
