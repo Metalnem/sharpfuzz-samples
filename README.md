@@ -10,7 +10,6 @@
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/AngleSharp)
 - [Bond](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Bond)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
-- [DocumentFormat.OpenXml](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DocumentFormat.OpenXml)
 - [DotLiquid](https://github.com/Metalnem/sharpfuzz-samples/tree/master/DotLiquid)
 - [esprima](https://github.com/Metalnem/sharpfuzz-samples/tree/master/esprima)
 - [ExCSS](https://github.com/Metalnem/sharpfuzz-samples/tree/master/ExCSS)
