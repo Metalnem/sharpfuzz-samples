@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Bond.IO.Unsafe;
+﻿using Bond.IO.Unsafe;
 using Bond.Protocols;
 using examples.serialization;
 using SharpFuzz;
@@ -20,10 +18,7 @@ namespace Bond.Fuzz
 
 					Deserialize<Struct>.From(reader);
 				}
-				catch (ArgumentOutOfRangeException) { }
-				catch (IndexOutOfRangeException) { }
-				catch (InvalidDataException) { }
-				catch (IOException) { }
+				catch { }
 			});
 		}
 	}
