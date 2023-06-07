@@ -19,7 +19,6 @@
 - [Handlebars](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Handlebars)
 - [HtmlAgilityPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/HtmlAgilityPack)
 - [Jint](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Jint)
-- [Jurassic](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Jurassic)
 - [Markdig](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Markdig)
 - [MessagePack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MessagePack)
 - [MsgPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MsgPack)
