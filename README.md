@@ -11,7 +11,7 @@
 - [Bond](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Bond)
 - [BouncyCastle](https://github.com/Metalnem/sharpfuzz-samples/tree/master/BouncyCastle)
 - [Google.Protobuf](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Google.Protobuf)
-- [GraphQL-Parser](https://github.com/Metalnem/sharpfuzz-samples/tree/master/GraphQL-Parser)
+- [GraphQL-Parser](https://github.com/Metalnem/sharpfuzz-samples/tree/master/GraphQL.Parser)
 - [HtmlAgilityPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/HtmlAgilityPack)
 - [Markdig](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Markdig)
 - [MessagePack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MessagePack)
