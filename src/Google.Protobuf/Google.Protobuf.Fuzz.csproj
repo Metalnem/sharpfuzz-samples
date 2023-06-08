@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>$(DotnetVersion)</TargetFramework>
   </PropertyGroup>
 
 </Project>
