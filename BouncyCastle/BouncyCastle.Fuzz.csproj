@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="2.0.2" />
-    <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+    <PackageReference Include="SharpFuzz"/>
+    <PackageReference Include="Portable.BouncyCastle"/>
   </ItemGroup>
 
   <PropertyGroup>

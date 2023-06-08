@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="2.0.2" />
-    <PackageReference Include="protobuf-net" Version="3.2.26" />
+    <PackageReference Include="SharpFuzz"/>
+    <PackageReference Include="protobuf-net"/>
   </ItemGroup>
 
   <PropertyGroup>

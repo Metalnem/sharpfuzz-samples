@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="SharpFuzz" Version="2.0.2" />
-    <PackageReference Include="AngleSharp" Version="1.0.2" />
+    <PackageReference Include="SharpFuzz"/>
+    <PackageReference Include="AngleSharp"/>
   </ItemGroup>
 
   <PropertyGroup>
