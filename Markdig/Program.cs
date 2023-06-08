@@ -6,12 +6,12 @@ namespace Markdig.Fuzz
 	{
 		public static void Main(string[] args)
 		{
-			Fuzzer.OutOfProcess.Run(text =>
+			Fuzzer.OutOfProcess.Run(s =>
 			{
 				try
 				{
 					var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-					Markdown.ToHtml(text, pipeline);
+					Markdown.ToHtml(s, pipeline);
 				}
 				catch { }
 			});

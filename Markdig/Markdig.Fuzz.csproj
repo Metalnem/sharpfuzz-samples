@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.31.0" />
-    <PackageReference Include="SharpFuzz" Version="2.0.2" />
+    <PackageReference Include="SharpFuzz"/>
+    <PackageReference Include="Markdig"/>
   </ItemGroup>
 
   <PropertyGroup>
