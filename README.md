@@ -1,5 +1,13 @@
 # SharpFuzz samples
 
+[![Build Status][build-shield]][build-link]
+[![License][license-shield]][license-link]
+
+[build-shield]: https://github.com/metalnem/sharpfuzz-samples/actions/workflows/dotnet.yml/badge.svg
+[build-link]: https://github.com/Metalnem/sharpfuzz-samples/actions/workflows/dotnet.yml
+[license-shield]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-link]: https://github.com/metalnem/sharpfuzz-samples/blob/master/LICENSE
+
 ## .NET Core
 
 - [CoreCLR](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/CoreCLR)
