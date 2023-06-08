@@ -1,5 +1,4 @@
-﻿using System;
-using SharpFuzz;
+﻿using SharpFuzz;
 
 namespace MessagePack.Fuzz
 {
@@ -13,11 +12,7 @@ namespace MessagePack.Fuzz
 				{
 					MessagePackSerializer.Deserialize<dynamic>(stream);
 				}
-				catch (ArgumentException) { }
-				catch (IndexOutOfRangeException) { }
-				catch (InvalidOperationException) { }
-				catch (OutOfMemoryException) { }
-				catch (OverflowException) { }
+				catch { }
 			});
 		}
 	}

@@ -13,6 +13,7 @@
     <PackageVersion Include="Google.Protobuf" Version="3.23.2"/>
     <PackageVersion Include="GraphQL-Parser" Version="9.1.0"/>
     <PackageVersion Include="Grpc.Tools" Version="2.51.0"/>
+    <PackageVersion Include="MessagePack" Version="2.5.108"/>
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
     <PackageVersion Include="Portable.BouncyCastle" Version="1.9.0"/>
     <PackageVersion Include="protobuf-net" Version="3.2.26"/>

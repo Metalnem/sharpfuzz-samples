@@ -15,7 +15,6 @@
 - [HtmlAgilityPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/HtmlAgilityPack)
 - [Markdig](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Markdig)
 - [MessagePack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MessagePack)
-- [MsgPack](https://github.com/Metalnem/sharpfuzz-samples/tree/master/MsgPack)
 - [Newtonsoft.Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/Newtonsoft.Json)
 - [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/ProtobufNet)
 - [YamlDotNet](https://github.com/Metalnem/sharpfuzz-samples/tree/master/YamlDotNet)
