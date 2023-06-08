@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using SharpFuzz;
-using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
 namespace YamlDotNet.Fuzz
@@ -19,8 +17,7 @@ namespace YamlDotNet.Fuzz
 						new YamlStream().Load(reader);
 					}
 				}
-				catch (ArgumentException) { }
-				catch (YamlException) { }
+				catch  { }
 			});
 		}
 	}
