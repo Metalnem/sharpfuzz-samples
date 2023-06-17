@@ -5,7 +5,7 @@ param (
     [string]$i,
     [string]$x = $null,
     [int]$t = 10000,
-    [int]$m = 10000
+    [string]$command = "sharpfuzz"
 )
 
 Set-StrictMode -Version Latest
@@ -35,7 +35,7 @@ $fuzzingTargets = Get-ChildItem $outputDir -Filter *.dll `
 
 foreach ($fuzzingTarget in $fuzzingTargets) {
     Write-Output "Instrumenting $fuzzingTarget"
-    sharpfuzz $fuzzingTarget
+    & $command $fuzzingTarget
     
     if ($LastExitCode -ne 0) {
         Write-Error "An error occurred while instrumenting $fuzzingTarget"
@@ -43,9 +43,11 @@ foreach ($fuzzingTarget in $fuzzingTargets) {
     }
 }
 
+$env:AFL_SKIP_BIN_CHECK = 1
+
 if ($x) {
-    afl-fuzz -i $i -o $findingsDir -t $t -m $m -x $x dotnet $project
+    afl-fuzz -i $i -o $findingsDir -t $t -m none -x $x dotnet $project
 }
 else {
-    afl-fuzz -i $i -o $findingsDir -t $t -m $m dotnet $project
+    afl-fuzz -i $i -o $findingsDir -t $t -m none dotnet $project
 }
