@@ -22,9 +22,6 @@ Complete SharpFuzz fuzzing projects for various NuGet packages:
 - [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/ProtobufNet)
 - [YamlDotNet](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/YamlDotNet)
 
-The fuzzing script ([fuzz.ps1](https://github.com/Metalnem/sharpfuzz/raw/master/scripts/fuzz.ps1))
-is located in the main [SharpFuzz](https://github.com/Metalnem/sharpfuzz) repo.
-
 Example usage:
 
 ```powershell
@@ -39,3 +36,6 @@ scripts/fuzz.ps1 src/Markdig/Markdig.Fuzz.csproj `
     -i src/Markdig/Testcases `
     -x dictionaries/markdown.dict
 ```
+
+The fuzzing script ([fuzz.ps1](https://github.com/Metalnem/sharpfuzz/raw/master/scripts/fuzz.ps1))
+is located in the main [SharpFuzz](https://github.com/Metalnem/sharpfuzz) repo.
