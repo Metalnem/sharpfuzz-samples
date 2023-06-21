@@ -8,12 +8,7 @@
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
 [license-link]: https://github.com/metalnem/sharpfuzz-samples/blob/master/LICENSE
 
-## .NET Core
-
-- [CoreCLR](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/CoreCLR)
-- [CoreFX](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/CoreFX)
-
-## NuGet
+Complete SharpFuzz fuzzing projects for various NuGet packages:
 
 - [AngleSharp](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/AngleSharp)
 - [Bond](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/Bond)
@@ -26,3 +21,21 @@
 - [Newtonsoft.Json](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/Newtonsoft.Json)
 - [protobuf-net](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/ProtobufNet)
 - [YamlDotNet](https://github.com/Metalnem/sharpfuzz-samples/tree/master/src/YamlDotNet)
+
+The fuzzing script ([fuzz.ps1](https://github.com/Metalnem/sharpfuzz/raw/master/scripts/fuzz.ps1))
+is located in the main [SharpFuzz](https://github.com/Metalnem/sharpfuzz) repo.
+
+Example usage:
+
+```powershell
+scripts/fuzz.ps1 src/ProtobufNet/ProtobufNet.Fuzz.csproj `
+    -i src/ProtobufNet/Testcases
+```
+
+Example usage with a dictionary file:
+
+```powershell
+scripts/fuzz.ps1 src/Markdig/Markdig.Fuzz.csproj `
+    -i src/Markdig/Testcases `
+    -x dictionaries/markdown.dict
+```
