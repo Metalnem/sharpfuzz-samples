@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="SharpFuzz" Version="2.1.0"/>
+    <PackageVersion Include="SharpFuzz" Version="2.1.1"/>
   </ItemGroup>
 
   <ItemGroup>
